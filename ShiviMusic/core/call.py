@@ -1,6 +1,6 @@
 # -----------------------------------------------
-# 🔸 StrangerMusic Project
-# 🔹 Developed & Maintained by: Shashank Shukla (https://github.com/itzshukla)
+# 🔸 shiviMusic Project
+# 🔹 Developed & Maintained by: Badanm xd(https://github.com/kirtibots)
 # 📅 Copyright © 2022 – All Rights Reserved
 #
 # 📖 License:
@@ -9,7 +9,7 @@
 # Commercial use, redistribution, or removal of this notice is strictly prohibited
 # without prior written permission from the author.
 #
-# ❤️ Made with dedication and love by ItzShukla
+# ❤️ Made with dedication and love by annu_updates
 # -----------------------------------------------
 import asyncio
 import os
