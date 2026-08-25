@@ -327,7 +327,7 @@ class Call(PyTgCalls):
             file_path if direct else f"vid_{track['vidid']}",
             title,
             duration_min,
-            "🔁 ᴋɪʀᴛɪ-ʙᴏᴛs",
+            "ᴧᴜᴛᴏᴘʟᴧʏ ✨",
             track["vidid"],
             1,
             "audio",
