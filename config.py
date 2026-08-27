@@ -32,9 +32,8 @@ ASSUSERNAME = getenv("ASSUSERNAME")
 MONGO_DB_URI = getenv("MONGO_DB_URI", None)
 LOGGER_ID = int(getenv("LOGGER_ID", -1003670001038))
 
-API_URL = "https://teaminflex.xyz"
-
-API_KEY = "INFLEX57606928D"
+ARC_API_URL = getenv("ARC_API_URL", "https://api.arcmusic.fun")
+ARC_API_KEY = getenv("ARC_API_KEY", "ARCf295f5d82130eb1f9390d7")
 
 
 # ======================================================
