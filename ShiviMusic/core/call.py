@@ -288,7 +288,7 @@ class Call(PyTgCalls):
         try:
             status_msg = await app.send_message(
                 original_chat_id,
-                "ʜσʟᴅ ση...\n\nᴅσᴡηʟσᴧᴅɪηɢ ηєxᴛ ϻєᴅɪᴧ ғʀσϻ ᴛʜє ǫυєυє.",
+                "🔁 ᴀᴜᴛᴏᴘʟᴀʏ\n\nꜰᴇᴛᴄʜɪɴɢ ɴᴇxᴛ sᴏɴɢ...",
             )
         except Exception:
             status_msg = None
