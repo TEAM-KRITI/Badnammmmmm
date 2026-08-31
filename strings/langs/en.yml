@@ -176,8 +176,8 @@ queue_8 : "<b>{0} ᴘʟᴀʏᴇʀ</b>\n\n🎄 <b>sᴛʀᴇᴀᴍɪɴɢ :</b> {1}
 stream_1 : "<b><blockquote>✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ 𝐍๏Ꮗ ✮</blockquote></b>\n<blockquote expandable><b>✯ 𝐓ɩtɭ𝛆 : </b> <a href={0}>{1}</a>\n<b>✬ 𝐃ʋɽɑʈɩσŋ : </b> {2}\n<b>✭ 𝐁ɣ : </b> {3}</blockquote>\n<blockquote><b>❖ 𝐏ᴏᴡєʀєᴅ 𝐁ɣ : [˹ᴋɪʀᴛɪ-ʙᴏᴛs˼](t.me/annu_updates)</b></blockquote>"
 stream_2 : "<b><blockquote>✮ 𝐒ʈᴧʀʈ𝛆ɗ 𝐒ʈʀ𝛆ɑɱɩŋʛ 𝐍๏Ꮗ ✮</blockquote></b>\n<blockquote><b>✭ 𝐁ɣ : </b> {0}</blockquote>"
 
-CLOSE_BUTTON  : "• ᴄʟᴏsє •"
-BACK_BUTTON : "• ʙ ᴧ ᴄ ᴋ •"
+CLOSE_BUTTON  : "⌯ ᴄʟᴏsє ⌯"
+BACK_BUTTON : "⌯ ʙᴀᴄᴋ ⌯"
 
 NEXT_PAGE: "▷"
 BACK_PAGE: "◁"
