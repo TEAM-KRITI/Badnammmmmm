@@ -51,21 +51,14 @@ from config import BANNED_USERS, OWNER_ID
 
 
 NEXI_VID = [
-    "https://files.catbox.moe/x5lytj.jpg",
-    "https://files.catbox.moe/psya34.jpg",
-    "https://files.catbox.moe/leaexg.jpg",
-    "https://files.catbox.moe/b0e4vk.jpg",
-    "https://files.catbox.moe/1b1wap.jpg",
-    "https://files.catbox.moe/ommjjk.jpg",
-    "https://files.catbox.moe/onurxm.jpg",
-    "https://files.catbox.moe/97v75k.jpg",
-    "https://files.catbox.moe/t833zy.jpg",
-    "https://files.catbox.moe/472piq.jpg",
-    "https://files.catbox.moe/qwjeyk.jpg",
-    "https://files.catbox.moe/t0hopv.jpg",
-    "https://files.catbox.moe/u5ux0j.jpg",
-    "https://files.catbox.moe/h1yk4w.jpg",
-    "https://files.catbox.moe/gl5rg8.jpg",
+    "https://n.uguu.se/COCvZVmH.jpg",
+    "https://n.uguu.se/sUnCjERi.jpg",
+    "https://h.uguu.se/UFespaut.jpg",
+    "https://n.uguu.se/JQCcgtmE.jpg",
+    "https://d.uguu.se/SDjTEpEk.jpg",
+    "https://n.uguu.se/FzOLVSlF.jpg",
+    "https://n.uguu.se/QnLMTcYx.jpg",
+    "https://d.uguu.se/aOQGWHbN.jpg"
 ]
 
 
