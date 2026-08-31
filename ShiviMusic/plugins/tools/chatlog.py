@@ -22,8 +22,14 @@ from pyrogram.enums import ParseMode
 
 
 photo = [
-    "https://files.catbox.moe/6zdimc.jpg",
-    "https://files.catbox.moe/2n0oow.jpg",
+    "https://n.uguu.se/COCvZVmH.jpg",
+    "https://n.uguu.se/sUnCjERi.jpg",
+    "https://h.uguu.se/UFespaut.jpg",
+    "https://n.uguu.se/JQCcgtmE.jpg",
+    "https://d.uguu.se/SDjTEpEk.jpg",
+    "https://n.uguu.se/FzOLVSlF.jpg",
+    "https://n.uguu.se/QnLMTcYx.jpg",
+    "https://d.uguu.se/aOQGWHbN.jpg"
     
 ]  
 
