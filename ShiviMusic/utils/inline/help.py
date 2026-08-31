@@ -83,17 +83,17 @@ def help_pannel(_, START: Union[bool, int] = None):
             ],
             [
                 InlineKeyboardButton(
-                    text="• ᴡᴇʟᴄᴏᴍᴇ •",
+                    text="⌯ ᴡᴇʟᴄᴏᴍᴇ ⌯",
                     callback_data="wel_cb",
                     style=ButtonStyle.SUCCESS,
                 ),
                 InlineKeyboardButton(
-                    text="• ʟᴏᴄᴋs •",
+                    text="⌯ ʟᴏᴄᴋs ⌯",
                     callback_data="lock_cb",
                     style=ButtonStyle.SUCCESS,
                 ),
                 InlineKeyboardButton(
-                    text="• ɴɪɢʜᴛᴍᴏᴅᴇ •",
+                    text="⌯ ɴɪɢʜᴛᴍᴏᴅᴇ ⌯",
                     callback_data="night_cb",
                     style=ButtonStyle.SUCCESS,
                 ),
