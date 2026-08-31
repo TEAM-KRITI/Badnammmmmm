@@ -26,21 +26,14 @@ from ShiviMusic.utils.stuffs.helper import Helper
 
 
 START_IMG = [
-    "https://files.catbox.moe/et1kky.jpg",
-    "https://files.catbox.moe/r6xs75.jpg",
-    "https://files.catbox.moe/qropc3.jpg",
-    "https://files.catbox.moe/nlbahf.jpg",
-    "https://files.catbox.moe/njrl6e.jpg",
-    "https://files.catbox.moe/7p0po1.jpg",
-    "https://files.catbox.moe/9sxqlx.jpg",
-    "https://files.catbox.moe/xrme38.jpg",
-    "https://files.catbox.moe/1nz3wk.jpg",
-    "https://files.catbox.moe/ev9586.jpg",
-    "https://files.catbox.moe/hjfr1n.jpg",
-    "https://files.catbox.moe/68c2m9.jpg",
-    "https://files.catbox.moe/1ol7pj.jpg",
-    "https://files.catbox.moe/v9hqvi.jpg",
-    "https://files.catbox.moe/v9hqvi.jpg",
+    "https://n.uguu.se/COCvZVmH.jpg",
+    "https://n.uguu.se/sUnCjERi.jpg",
+    "https://h.uguu.se/UFespaut.jpg",
+    "https://n.uguu.se/JQCcgtmE.jpg",
+    "https://d.uguu.se/SDjTEpEk.jpg",
+    "https://n.uguu.se/FzOLVSlF.jpg",
+    "https://n.uguu.se/QnLMTcYx.jpg",
+    "https://d.uguu.se/aOQGWHbN.jpg"
 ]
 
 @app.on_message(filters.command(["help"]) & filters.private & ~BANNED_USERS)
