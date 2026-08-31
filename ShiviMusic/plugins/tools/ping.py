@@ -24,18 +24,14 @@ from ShiviMusic.utils.inline import supp_markup
 from config import BANNED_USERS, PING_IMG_URL
 
 Shivi_PIC = [
-    "https://files.catbox.moe/fh7vw7.jpg",
-    "https://files.catbox.moe/lckxh6.jpg",
-    "https://files.catbox.moe/smteo6.jpg",
-    "https://files.catbox.moe/7enu2i.jpg",
-    "https://files.catbox.moe/n6hkvd.jpg",
-    "https://files.catbox.moe/ej1p7t.jpg",
-    "https://files.catbox.moe/fh7vw7.jpg",
-    "https://files.catbox.moe/lckxh6.jpg",
-    "https://files.catbox.moe/smteo6.jpg",
-    "https://files.catbox.moe/7enu2i.jpg",
-    "https://files.catbox.moe/n6hkvd.jpg",
-    "https://files.catbox.moe/ej1p7t.jpg"
+    "https://n.uguu.se/COCvZVmH.jpg",
+    "https://n.uguu.se/sUnCjERi.jpg",
+    "https://h.uguu.se/UFespaut.jpg",
+    "https://n.uguu.se/JQCcgtmE.jpg",
+    "https://d.uguu.se/SDjTEpEk.jpg",
+    "https://n.uguu.se/FzOLVSlF.jpg",
+    "https://n.uguu.se/QnLMTcYx.jpg",
+    "https://d.uguu.se/aOQGWHbN.jpg"
 ]
 
 @app.on_message(filters.command(["ping", "alive"]) & ~BANNED_USERS)
