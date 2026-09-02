@@ -5,99 +5,43 @@ from typing import Union
 import yt_dlp
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
-from py_yt import VideosSearch
+from py_yt import VideosSearch, Playlist
 import aiohttp
- 
-from ShiviMusic import app
-from config import ARC_API_URL, ARC_API_KEY
- 
- 
+
+
+API_URL = os.environ.get("MusicSp_API_URL", "https://apisparrow.site")
+
+API_KEY = os.environ.get("MusicSp_API_KEY", "Enter Your Api") ## Get This API KEY From : @SpYtAPIBot 
+DOWNLOAD_DIR = "downloads"
+
+
 def time_to_seconds(time):
     stringt = str(time)
     return sum(int(x) * 60 ** i for i, x in enumerate(reversed(stringt.split(":"))))
- 
- 
-async def _arc_request_download(video_id: str, is_video: bool) -> dict:
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            f"{ARC_API_URL.rstrip('/')}/youtube/v2/download",
-            params={"query": video_id, "isVideo": str(is_video).lower(), "api_key": ARC_API_KEY},
-            timeout=aiohttp.ClientTimeout(total=30),
-        ) as resp:
-            if resp.status != 200:
-                return {}
-            return await resp.json(content_type=None)
- 
- 
-async def _arc_poll_job(job_id: str, retries: int = 15, interval: int = 3) -> str | None:
-    async with aiohttp.ClientSession() as session:
-        for _ in range(retries):
-            async with session.get(
-                f"{ARC_API_URL.rstrip('/')}/youtube/jobStatus",
-                params={"job_id": job_id, "api_key": ARC_API_KEY},
-                timeout=aiohttp.ClientTimeout(total=15),
-            ) as resp:
-                if resp.status == 200:
-                    data = await resp.json(content_type=None)
-                    job = data.get("job", {})
-                    if job.get("status") == "done":
-                        return job.get("result", {}).get("cdn")
-                    if job.get("status") == "error":
-                        return None
-            await asyncio.sleep(interval)
-    return None
- 
- 
-async def _arc_get_cdn(video_id: str, is_video: bool) -> str | None:
-    data = await _arc_request_download(video_id, is_video)
-    if not data:
-        return None
- 
-    job_id = data.get("job_id")
-    if not job_id:
-        return data.get("result", {}).get("cdn")
- 
-    return await _arc_poll_job(job_id)
- 
- 
-async def _save_from_cdn(cdn: str, file_path: str) -> bool:
-    match = re.match(r"https?://(?:t\.me|telegram\.dog)/([^/]+)/(\d+)", cdn)
-    if match:
-        username, message_id = match.group(1), int(match.group(2))
-        msg = await app.get_messages(username, message_id)
-        if not msg or not (msg.audio or msg.video or msg.document):
-            return False
-        downloaded = await app.download_media(msg, file_name=file_path)
-        return bool(downloaded)
- 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(cdn, timeout=aiohttp.ClientTimeout(total=600)) as resp:
-            if resp.status != 200:
-                return False
-            with open(file_path, "wb") as f:
-                async for chunk in resp.content.iter_chunked(131072):
-                    f.write(chunk)
-    return True
- 
- 
+
+
 async def download_song(link: str) -> str:
     video_id = link.split("v=")[-1].split("&")[0] if "v=" in link else link
     if not video_id or len(video_id) < 3:
         return None
- 
-    os.makedirs("downloads", exist_ok=True)
-    file_path = os.path.join("downloads", f"{video_id}.mp3")
+
+    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+    file_path = os.path.join(DOWNLOAD_DIR, f"{video_id}.mp3")
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
- 
+
     try:
-        cdn = await _arc_get_cdn(video_id, is_video=False)
-        if not cdn:
-            return None
- 
-        if not await _save_from_cdn(cdn, file_path):
-            return None
- 
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{API_URL}/download",
+                params={"url": video_id, "type": "audio", "api_key": API_KEY},
+                timeout=aiohttp.ClientTimeout(total=300)
+            ) as resp:
+                if resp.status != 200:
+                    return None
+                with open(file_path, "wb") as f:
+                    async for chunk in resp.content.iter_chunked(131072):
+                        f.write(chunk)
         if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
             return file_path
         return None
@@ -108,26 +52,30 @@ async def download_song(link: str) -> str:
             except Exception:
                 pass
         return None
- 
- 
+
+
 async def download_video(link: str) -> str:
     video_id = link.split("v=")[-1].split("&")[0] if "v=" in link else link
     if not video_id or len(video_id) < 3:
         return None
- 
-    os.makedirs("downloads", exist_ok=True)
-    file_path = os.path.join("downloads", f"{video_id}.mp4")
+
+    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+    file_path = os.path.join(DOWNLOAD_DIR, f"{video_id}.mp4")
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
- 
+
     try:
-        cdn = await _arc_get_cdn(video_id, is_video=True)
-        if not cdn:
-            return None
- 
-        if not await _save_from_cdn(cdn, file_path):
-            return None
- 
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{API_URL}/download",
+                params={"url": video_id, "type": "video", "api_key": API_KEY},
+                timeout=aiohttp.ClientTimeout(total=600)
+            ) as resp:
+                if resp.status != 200:
+                    return None
+                with open(file_path, "wb") as f:
+                    async for chunk in resp.content.iter_chunked(131072):
+                        f.write(chunk)
         if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
             return file_path
         return None
@@ -138,8 +86,8 @@ async def download_video(link: str) -> str:
             except Exception:
                 pass
         return None
- 
- 
+
+
 class YouTubeAPI:
     def __init__(self):
         self.base = "https://www.youtube.com/watch?v="
@@ -147,12 +95,12 @@ class YouTubeAPI:
         self.status = "https://www.youtube.com/oembed?url="
         self.listbase = "https://youtube.com/playlist?list="
         self.reg = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
- 
+
     async def exists(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
         return bool(re.search(self.regex, link))
- 
+
     async def url(self, message_1: Message) -> Union[str, None]:
         messages = [message_1]
         if message_1.reply_to_message:
@@ -168,7 +116,7 @@ class YouTubeAPI:
                     if entity.type == MessageEntityType.TEXT_LINK:
                         return entity.url
         return None
- 
+
     async def details(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -182,7 +130,7 @@ class YouTubeAPI:
             vidid = result["id"]
             duration_sec = int(time_to_seconds(duration_min)) if duration_min else 0
         return title, duration_min, duration_sec, thumbnail, vidid
- 
+
     async def title(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -191,7 +139,7 @@ class YouTubeAPI:
         results = VideosSearch(link, limit=1)
         for result in (await results.next())["result"]:
             return result["title"]
- 
+
     async def duration(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -200,7 +148,7 @@ class YouTubeAPI:
         results = VideosSearch(link, limit=1)
         for result in (await results.next())["result"]:
             return result["duration"]
- 
+
     async def thumbnail(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -209,7 +157,7 @@ class YouTubeAPI:
         results = VideosSearch(link, limit=1)
         for result in (await results.next())["result"]:
             return result["thumbnails"][0]["url"].split("?")[0]
- 
+
     async def video(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -222,7 +170,7 @@ class YouTubeAPI:
             return 0, "Video download failed"
         except Exception as e:
             return 0, f"Video download error: {e}"
- 
+
     async def playlist(self, link, limit, user_id, videoid: Union[bool, str] = None):
         if videoid:
             link = self.listbase + link
@@ -242,7 +190,7 @@ class YouTubeAPI:
                 continue
             ids.append(vid)
         return ids
- 
+
     async def track(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -263,7 +211,7 @@ class YouTubeAPI:
             "thumb": thumbnail,
         }
         return track_details, vidid
- 
+
     async def formats(self, link: str, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -290,7 +238,7 @@ class YouTubeAPI:
                 except Exception:
                     continue
         return formats_available, link
- 
+
     async def slider(self, link: str, query_type: int, videoid: Union[bool, str] = None):
         if videoid:
             link = self.base + link
@@ -303,7 +251,7 @@ class YouTubeAPI:
         vidid = result[query_type]["id"]
         thumbnail = result[query_type]["thumbnails"][0]["url"].split("?")[0]
         return title, duration_min, thumbnail, vidid
- 
+
     async def download(
         self,
         link: str,
@@ -327,5 +275,6 @@ class YouTubeAPI:
             return None, False
         except Exception:
             return None, False
- 
+
+
 YouTube = YouTubeAPI()
