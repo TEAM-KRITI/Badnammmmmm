@@ -11,7 +11,7 @@ import aiohttp
 
 API_URL = os.environ.get("MusicSp_API_URL", "https://apisparrow.site")
 
-API_KEY = os.environ.get("MusicSp_API_KEY", "Enter Your Api") ## Get This API KEY From : @SpYtAPIBot 
+API_KEY = os.environ.get("MusicSp_API_KEY", "sparrowHm39TaBT3Bv7xn2rZmC92pK9") ## Get This API KEY From : @SpYtAPIBot 
 DOWNLOAD_DIR = "downloads"
 
 
