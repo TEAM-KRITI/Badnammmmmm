@@ -1,22 +1,21 @@
 # ===========================================================
 # ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 🚀
-# 
+#
 # This source code is under MIT License 📜
-# ❌ Unauthorized forking, importing, or using this code
-#    without giving proper credit will result in legal action ⚠️
-# 
-# 📩 DM for permission : @TheSigmaCoder
 # ===========================================================
 
 from pyrogram import Client
 import config
+
 from ..logging import LOGGER
+
 
 assistants = []
 assistantids = []
 
 
 class Userbot(Client):
+
     def __init__(self):
         self.one = Client(
             name="ShiviAss1",
@@ -25,6 +24,7 @@ class Userbot(Client):
             session_string=str(config.STRING1),
             no_updates=True,
         )
+
         self.two = Client(
             name="ShiviAss2",
             api_id=config.API_ID,
@@ -32,6 +32,7 @@ class Userbot(Client):
             session_string=str(config.STRING2),
             no_updates=True,
         )
+
         self.three = Client(
             name="ShiviAss3",
             api_id=config.API_ID,
@@ -39,6 +40,7 @@ class Userbot(Client):
             session_string=str(config.STRING3),
             no_updates=True,
         )
+
         self.four = Client(
             name="ShiviAss4",
             api_id=config.API_ID,
@@ -46,6 +48,7 @@ class Userbot(Client):
             session_string=str(config.STRING4),
             no_updates=True,
         )
+
         self.five = Client(
             name="ShiviAss5",
             api_id=config.API_ID,
@@ -54,132 +57,192 @@ class Userbot(Client):
             no_updates=True,
         )
 
+    async def _start_assistant(self, client, number, chats):
+        """
+        Safely start one assistant.
+        """
+
+        if not getattr(config, f"STRING{number}", None):
+            return False
+
+        try:
+            await client.start()
+
+            # Join required chats.
+            for chat in chats:
+                try:
+                    await client.join_chat(chat)
+                except Exception:
+                    pass
+
+            # Get Telegram user information.
+            me = await client.get_me()
+
+            client.id = me.id
+            client.name = me.mention
+            client.username = me.username
+
+            # Add only after successful startup.
+            if number not in assistants:
+                assistants.append(number)
+
+            if me.id not in assistantids:
+                assistantids.append(me.id)
+
+            try:
+                await client.send_message(
+                    config.LOGGER_ID,
+                    "» ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ",
+                )
+            except Exception:
+                LOGGER(__name__).warning(
+                    f"» ᴀssɪsᴛᴀɴᴛ {number} ᴄᴏᴜʟᴅ ɴᴏᴛ sᴇɴᴅ ᴛʜᴇ ʟᴏɢ ᴍᴇssᴀɢᴇ."
+                )
+
+            LOGGER(__name__).info(
+                f"✦ ᴀssɪsᴛᴀɴᴛ {number} sᴛᴀʀᴛᴇᴅ ᴀs {client.name}"
+            )
+
+            return True
+
+        except Exception as e:
+
+            LOGGER(__name__).error(
+                f"❌ ᴀssɪsᴛᴀɴᴛ {number} ғᴀɪʟᴇᴅ ᴛᴏ sᴛᴀʀᴛ: {e}"
+            )
+
+            # Make sure failed assistant is not selected.
+            if number in assistants:
+                assistants.remove(number)
+
+            try:
+                if client.is_connected:
+                    await client.stop()
+            except Exception:
+                pass
+
+            return False
+
     async def start(self):
-        LOGGER(__name__).info(f"» sᴛᴀʀᴛɪɴɢ ᴀssɪsᴛᴀɴᴛs...")
-        if config.STRING1:
-            await self.one.start()
-            try:
-                await self.one.join_chat("Kirti_update")
-                await self.one.join_chat("kirti_chat_support")
-            except:
-                pass
-            assistants.append(1)
-            try:
-                await self.one.send_message(config.LOGGER_ID, "» ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
-            except:
-                LOGGER(__name__).error(
-                    "» ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ 1 ʜᴀs ғᴀɪʟᴇᴅ ᴛᴏ ᴀᴄᴄᴇss ᴛʜᴇ ʟᴏɢ ɢʀᴏᴜᴘ. ᴍᴀᴋᴇ sᴜʀᴇ ᴛʜᴀᴛ ʏᴏᴜ ʜᴀᴠᴇ ᴀᴅᴅᴇᴅ ᴀɴᴅ ᴘʀᴏᴍᴏᴛᴇᴅ ʏᴏᴜʀ ᴀssɪsᴛᴀɴᴛ ɪɴ ᴛʜᴇ ʟᴏɢ ɢʀᴏᴜᴘ!"
-                )
-                exit()
-            self.one.id = self.one.me.id
-            self.one.name = self.one.me.mention
-            self.one.username = self.one.me.username
-            assistantids.append(self.one.id)
-            LOGGER(__name__).info(f"✦ ᴀssɪsᴛᴀɴᴛ ᴏɴᴇ sᴛᴀʀᴛᴇᴅ ᴀs {self.one.name}")
+        LOGGER(__name__).info(
+            "» sᴛᴀʀᴛɪɴɢ ᴀssɪsᴛᴀɴᴛs..."
+        )
 
-        if config.STRING2:
-            await self.two.start()
-            try:
-                await self.two.join_chat("Kirti_update")
-                await self.one.join_chat("kirti_chat_support")
-            except:
-                pass
-            assistants.append(2)
-            try:
-                await self.two.send_message(config.LOGGER_ID, "» ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
-            except:
-                LOGGER(__name__).error(
-                    "» ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ 2 ʜᴀs ғᴀɪʟᴇᴅ ᴛᴏ ᴀᴄᴄᴇss ᴛʜᴇ ʟᴏɢ ɢʀᴏᴜᴘ. ᴍᴀᴋᴇ sᴜʀᴇ ɪᴛ ɪs ᴀᴅᴅᴇᴅ ᴀɴᴅ ᴘʀᴏᴍᴏᴛᴇᴅ!"
-                )
-                exit()
-            self.two.id = self.two.me.id
-            self.two.name = self.two.me.mention
-            self.two.username = self.two.me.username
-            assistantids.append(self.two.id)
-            LOGGER(__name__).info(f"✦ ᴀssɪsᴛᴀɴᴛ ᴛᴡᴏ sᴛᴀʀᴛᴇᴅ ᴀs {self.two.name}")
+        # Clear old values after restart/reload.
+        assistants.clear()
+        assistantids.clear()
 
-        if config.STRING3:
-            await self.three.start()
-            try:
-                await self.three.join_chat("kirti_chat_support")
-                await self.one.join_chat("Kirti_update")
-            except:
-                pass
-            assistants.append(3)
-            try:
-                await self.three.send_message(config.LOGGER_ID, "» ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
-            except:
-                LOGGER(__name__).error(
-                    "» ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ 3 ʜᴀs ғᴀɪʟᴇᴅ ᴛᴏ ᴀᴄᴄᴇss ᴛʜᴇ ʟᴏɢ ɢʀᴏᴜᴘ. ᴘʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ᴘᴇʀᴍɪssɪᴏɴs!"
-                )
-                exit()
-            self.three.id = self.three.me.id
-            self.three.name = self.three.me.mention
-            self.three.username = self.three.me.username
-            assistantids.append(self.three.id)
-            LOGGER(__name__).info(f"✦ ᴀssɪsᴛᴀɴᴛ ᴛʜʀᴇᴇ sᴛᴀʀᴛᴇᴅ ᴀs {self.three.name}")
+        # ---------------------------------------------------
+        # ASSISTANT 1
+        # ---------------------------------------------------
 
-        if config.STRING4:
-            await self.four.start()
-            try:
-                await self.four.join_chat("kirti_chat_support")
-                await self.one.join_chat("Kirti_update")
-            except:
-                pass
-            assistants.append(4)
-            try:
-                await self.four.send_message(config.LOGGER_ID, "» ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
-            except:
-                LOGGER(__name__).error(
-                    "» ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ 4 ʜᴀs ғᴀɪʟᴇᴅ ᴛᴏ ᴀᴄᴄᴇss ᴛʜᴇ ʟᴏɢ ɢʀᴏᴜᴘ. ᴘʟᴇᴀsᴇ ᴘʀᴏᴍᴏᴛᴇ ɪᴛ ᴀs ᴀɴ ᴀᴅᴍɪɴ!"
-                )
-                exit()
-            self.four.id = self.four.me.id
-            self.four.name = self.four.me.mention
-            self.four.username = self.four.me.username
-            assistantids.append(self.four.id)
-            LOGGER(__name__).info(f"✦ ᴀssɪsᴛᴀɴᴛ ғᴏᴜʀ sᴛᴀʀᴛᴇᴅ ᴀs {self.four.name}")
+        await self._start_assistant(
+            self.one,
+            1,
+            [
+                "Kirti_update",
+                "kirti_chat_support",
+            ],
+        )
 
-        if config.STRING5:
-            await self.five.start()
-            try:
-                await self.five.join_chat("kirti_chat_support")
-                await self.one.join_chat("Kirti_update")
-            except:
-                pass
-            assistants.append(5)
-            try:
-                await self.five.send_message(config.LOGGER_ID, "» ᴀssɪsᴛᴀɴᴛ sᴛᴀʀᴛᴇᴅ")
-            except:
-                LOGGER(__name__).error(
-                    "» ᴀssɪsᴛᴀɴᴛ ᴀᴄᴄᴏᴜɴᴛ 5 ʜᴀs ғᴀɪʟᴇᴅ ᴛᴏ ᴀᴄᴄᴇss ᴛʜᴇ ʟᴏɢ ɢʀᴏᴜᴘ. ᴘʟᴇᴀsᴇ ᴀᴅᴅ ᴀɴᴅ ᴘʀᴏᴍᴏᴛᴇ ɪᴛ!"
-                )
-                exit()
-            self.five.id = self.five.me.id
-            self.five.name = self.five.me.mention
-            self.five.username = self.five.me.username
-            assistantids.append(self.five.id)
-            LOGGER(__name__).info(f"✦ ᴀssɪsᴛᴀɴᴛ ғɪᴠᴇ sᴛᴀʀᴛᴇᴅ ᴀs {self.five.name}")
+        # ---------------------------------------------------
+        # ASSISTANT 2
+        # ---------------------------------------------------
+
+        await self._start_assistant(
+            self.two,
+            2,
+            [
+                "Kirti_update",
+                "kirti_chat_support",
+            ],
+        )
+
+        # ---------------------------------------------------
+        # ASSISTANT 3
+        # ---------------------------------------------------
+
+        await self._start_assistant(
+            self.three,
+            3,
+            [
+                "Kirti_update",
+                "kirti_chat_support",
+            ],
+        )
+
+        # ---------------------------------------------------
+        # ASSISTANT 4
+        # ---------------------------------------------------
+
+        await self._start_assistant(
+            self.four,
+            4,
+            [
+                "Kirti_update",
+                "kirti_chat_support",
+            ],
+        )
+
+        # ---------------------------------------------------
+        # ASSISTANT 5
+        # ---------------------------------------------------
+
+        await self._start_assistant(
+            self.five,
+            5,
+            [
+                "Kirti_update",
+                "kirti_chat_support",
+            ],
+        )
+
+        # ---------------------------------------------------
+        # FINAL STATUS
+        # ---------------------------------------------------
+
+        if assistants:
+            LOGGER(__name__).info(
+                f"✅ ᴀᴄᴛɪᴠᴇ ᴀssɪsᴛᴀɴᴛs: {assistants}"
+            )
+
+        else:
+            LOGGER(__name__).error(
+                "❌ ɴᴏ ᴀssɪsᴛᴀɴᴛ ᴡᴀs sᴛᴀʀᴛᴇᴅ. "
+                "ᴄʜᴇᴄᴋ STRING1-STRING5 ɪɴ ᴄᴏɴғɪɢ."
+            )
 
     async def stop(self):
-        LOGGER(__name__).info(f"» sᴛᴏᴘᴘɪɴɢ ᴀssɪsᴛᴀɴᴛs...")
-        try:
-            if config.STRING1:
-                await self.one.stop()
-            if config.STRING2:
-                await self.two.stop()
-            if config.STRING3:
-                await self.three.stop()
-            if config.STRING4:
-                await self.four.stop()
-            if config.STRING5:
-                await self.five.stop()
-        except:
-            pass
+        LOGGER(__name__).info(
+            "» sᴛᴏᴘᴘɪɴɢ ᴀssɪsᴛᴀɴᴛs..."
+        )
+
+        clients = [
+            self.one,
+            self.two,
+            self.three,
+            self.four,
+            self.five,
+        ]
+
+        for client in clients:
+            try:
+                if client.is_connected:
+                    await client.stop()
+            except Exception:
+                pass
+
+        assistants.clear()
+        assistantids.clear()
+
+        LOGGER(__name__).info(
+            "» ᴀʟʟ ᴀssɪsᴛᴀɴᴛs sᴛᴏᴘᴘᴇᴅ."
+        )
+
 
 # ===========================================================
 # ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 😎
-# 
+#
 # 🧑‍💻 Developer : t.me/TheSigmaCoder
 # 🔗 Source link : GitHub.com/Im-Notcoder/Shivi-V2
 # 📢 Telegram channel : t.me/Purvi_Bots
