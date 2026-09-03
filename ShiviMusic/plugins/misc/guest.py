@@ -1,6 +1,5 @@
 from pyrogram.enums import ParseMode
 from pyrogram.types import (
-from pyrogram.enums import ButtonStyle
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
@@ -37,7 +36,6 @@ def _add_me_markup(username: str):
                 InlineKeyboardButton(
                     text="✙ ʌᴅᴅ ϻє ɪη ʏσυʀ ɢʀσυᴘ ✙",
                     url=f"https://t.me/{username}?startgroup=true",
-                    style=ButtonStyle.PRIMARY),
                 )
             ]
         ]
