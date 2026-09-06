@@ -285,7 +285,7 @@ async def close_nightmode():
             await app.send_photo(
                 chat_id,
 
-                photo="https://d.uguu.se/CPlUJSEp.jpg",
+                photo="https://n.uguu.se/ulpfbxJW.jpg",
 
                 caption=(
                     "**🌅 𝐆σσ∂ 𝐌σяηιηɢ 𝐄νєяуσηє..!**\n"
