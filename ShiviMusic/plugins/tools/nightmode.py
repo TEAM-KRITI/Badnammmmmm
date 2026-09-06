@@ -59,11 +59,11 @@ buttons = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                "๏ 𝐄ηαвℓє ๏",
+                "๏ ᴇηᴧʙʟᴇ ๏",
                 callback_data="add_night"
             ),
             InlineKeyboardButton(
-                "๏ 𝐃ιѕαвℓє ๏",
+                "๏ ∂ɪѕᴧʙʟᴇ ๏",
                 callback_data="rm_night"
             )
         ]
@@ -79,7 +79,7 @@ NIGHT_MSG_BUTTONS = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                "𝐀∂∂ 𝐌є 𝐈η 𝐘συя 𝐆яσυρ",
+                "ᴧ∂∂ мᴇ ɪη ʏσυʀ ɢʀσυᴘ",
                 url=f"https://t.me/{app.username}?startgroup=true"
             )
         ]
@@ -98,9 +98,9 @@ async def _nightmode(_, message):
         photo="https://n.uguu.se/PbzKsnAJ.jpg",
 
         caption=(
-            "**⚙️ 𝐍ιɢнтмσ∂є 𝐒єттιηɢѕ**\n\n"
-            "**𝐂ℓι¢к тнє 𝐁υттσηѕ 𝐁єℓσω тσ 𝐂σηтяσℓ "
-            "𝐍ιɢнтмσ∂є 𝐒єттιηɢѕ 𝐅σя тнιѕ 𝐆яσυρ.**"
+            "**⚙️ ɴɪɢнᴛмσ∂ᴇ ѕᴇᴛᴛɪηɢѕ**\n\n"
+            "**ᴄʟɪᴄκ ᴛнᴇ ʙυᴛᴛσηѕ ʙᴇʟσω ᴛσ ᴄσηᴛʀσʟ "
+            "ɴɪɢнᴛмσ∂ᴇ ѕᴇᴛᴛɪηɢѕ ғσʀ ᴛнɪѕ ɢʀσυᴘ.**"
         ),
 
         parse_mode=enums.ParseMode.MARKDOWN,
@@ -135,7 +135,7 @@ async def nightcb(_, query: CallbackQuery):
 
     if user_id not in administrators:
         return await query.answer(
-            "❌ 𝐎ηℓу 𝐀∂мιηѕ 𝐂αη 𝐔ѕє 𝐓нιѕ 𝐂σммαη∂!",
+            "❌ σηʟʏ ᴧ∂мɪηѕ ᴄᴧη υѕᴇ ᴛнɪѕ ᴄσммᴧη∂!",
             show_alert=True
         )
 
@@ -149,8 +149,8 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**🌕 𝐍ιɢнтмσ∂є 𝐈ѕ 𝐀ℓяєα∂у "
-                    "𝐄ηαвℓє∂ 𝐈η 𝐓нιѕ 𝐆яσυρ.**"
+                    "**🌕 ɴɪɢнᴛмσ∂ᴇ ɪѕ ᴧʟʀᴇᴧ∂ʏ "
+                    "ᴇηᴧʙʟᴇ∂ ɪη ᴛнɪѕ ɢʀσυᴘ.**"
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN,
                 reply_markup=buttons
@@ -162,10 +162,10 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**✅ 𝐍ιɢнтмσ∂є 𝐀¢тιναтє∂!**\n\n"
-                    "**𝐓нιѕ 𝐆яσυρ 𝐖ιℓℓ 𝐀υтσмαтι¢αℓℓу "
-                    "𝐋σ¢к 𝐀т 𝟏𝟐:𝟎𝟎 𝐀𝐌 & 𝐔ηℓσ¢к 𝐀т "
-                    "𝟎𝟔:𝟎𝟎 𝐀𝐌 [𝐈𝐒𝐓].**"
+                    "**✅ ɴɪɢнᴛмσ∂ᴇ ᴧᴄᴛɪνᴧᴛᴇ∂!**\n\n"
+                    "**ᴛнɪѕ ɢʀσυᴘ ᴡɪʟʟ ᴧυᴛσмᴧᴛɪᴄᴧʟʟʏ "
+                    "ʟσᴄκ ᴧᴛ 𝟏𝟐:𝟎𝟎 ᴧм & υηʟσᴄκ ᴧᴛ "
+                    "𝟎𝟔:𝟎𝟎 ᴧм [ɪѕᴛ].**"
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN,
                 reply_markup=buttons
@@ -182,7 +182,7 @@ async def nightcb(_, query: CallbackQuery):
             await nightmode_off(chat_id)
 
             await query.message.edit_caption(
-                caption="**❌ 𝐍ιɢнтмσ∂є 𝐃єα¢тιναтє∂!**",
+                caption="**❌ ɴɪɢнᴛмσ∂ᴇ ∂ᴇᴧᴄᴛɪνᴧᴛᴇ∂!**",
                 parse_mode=enums.ParseMode.MARKDOWN,
                 reply_markup=buttons
             )
@@ -191,8 +191,8 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**🌑 𝐍ιɢнтмσ∂є 𝐈ѕ 𝐀ℓяєα∂у "
-                    "𝐓υяηє∂ 𝐎ƒƒ.**"
+                    "**🌑 ɴɪɢнᴛмσ∂ᴇ ɪѕ ᴧʟʀᴇᴧ∂ʏ "
+                    "ᴛυʀηᴇ∂ σғғ.**"
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN,
                 reply_markup=buttons
@@ -217,7 +217,7 @@ async def start_nightmode():
 
             group = await app.get_chat(chat_id)
 
-            group_name = group.title or "𝐔ηкησωη 𝐆яσυρ"
+            group_name = group.title or "υηκɴσωη ɢʀσυᴘ"
 
             await app.send_photo(
                 chat_id,
@@ -225,27 +225,25 @@ async def start_nightmode():
                 photo="https://d.uguu.se/agsYnJwN.jpg",
 
                 caption=(
-                    "**🌌 𝐆σσ∂ 𝐍ιɢнт 𝐄νєяуσηє!**\n"
+                    "**🌌 ɢσσ∂ ɴɪɢнᴛ ᴇνᴇʀʏσηᴇ!**\n"
                     "**━─────────────────━**\n\n"
 
-                    "**✨ 𝐓ιмє тσ 𝐓υяη 𝐎ƒƒ 𝐘συя 𝐒¢яєєηѕ "
-                    "αη∂ 𝐂αт¢н 𝐒σмє 𝐏єα¢єƒυℓ 𝐃яєαмѕ. "
-                    "𝐌αу 𝐘συя 𝐒ℓєєρ 𝐁є 𝐒ωєєт αη∂ "
-                    "𝐑єѕтƒυℓ.**\n\n"
+                    "**✨ ᴛɪмᴇ ᴛσ ᴛυʀη σғғ ʏσυʀ ѕᴄʀᴇᴇηѕ "
+                    "ᴧη∂ ᴄᴧᴛᴄн ѕσмᴇ ᴘᴇᴧᴄᴇғυʟ ∂ʀᴇᴧмѕ. "
+                    "мᴧʏ ʏσυʀ ѕʟᴇᴇᴘ ʙᴇ ѕᴡᴇᴇᴛ ᴧη∂ "
+                    "ʀᴇѕᴛғυʟ.**\n\n"
 
-                    "**🔒 𝐆яσυρ 𝐈ѕ 𝐍σω 𝐂ℓσѕє∂.**\n\n"
+                    "**🔒 ɢʀσυᴘ ɪѕ ησω ᴄʟσѕᴇ∂.**\n\n"
 
-                    "**• 𝐍σ 𝐌єѕѕαɢєѕ 𝐂αη 𝐁є 𝐒єηт "
-                    "𝐔ηтιℓ 𝐌σяηιηɢ. 𝐒єє 𝐘συ 𝐀ℓℓ "
-                    "𝐓σмσяяσω!**\n\n"
+                    "**• ησ мᴇѕѕᴧɢᴇѕ ᴄᴧη ʙᴇ ѕᴇηᴛ "
+                    "υηᴛɪʟ мσʀηɪηɢ. ѕᴇᴇ ʏσυ ᴧʟʟ "
+                    "ᴛσмσʀʀσω!**\n\n"
 
-                    # GROUP DETAILS
-                    f"**👥 𝐆яσυρ 𝐍αмє : {group_name}**\n"
-                    f"**🆔 𝐆яσυρ 𝐈𝐃 : `{chat_id}`**\n\n"
+                    f"**👥 ɢʀσυᴘ ηᴧмᴇ : {group_name}**\n"
+                    f"**🆔 ɢʀσυᴘ ɪ∂ : `{chat_id}`**\n\n"
 
-                    # POWERED BY
-                    "**⚡ 𝐏σωєяє∂ 𝐁у : "
-                    "[𝐊ιятι 𝐌υѕι¢](https://t.me/annu_updates)**"
+                    "**⚡ ᴘσωᴇʀᴇ∂ ʙʏ : "
+                    "[κɪʀᴛɪ мυѕɪᴄ](https://t.me/annu_updates)**"
                 ),
 
                 parse_mode=enums.ParseMode.MARKDOWN,
@@ -280,7 +278,7 @@ async def close_nightmode():
 
             group = await app.get_chat(chat_id)
 
-            group_name = group.title or "𝐔ηкησωη 𝐆яσυρ"
+            group_name = group.title or "υηκɴσωη ɢʀσυᴘ"
 
             await app.send_photo(
                 chat_id,
@@ -288,26 +286,24 @@ async def close_nightmode():
                 photo="https://n.uguu.se/ulpfbxJW.jpg",
 
                 caption=(
-                    "**🌅 𝐆σσ∂ 𝐌σяηιηɢ 𝐄νєяуσηє..!**\n"
+                    "**🌅 ɢσσ∂ мσʀηɪηɢ ᴇνᴇʀʏσηᴇ..!**\n"
                     "**━─────────────────━**\n\n"
 
-                    "**✨ 𝐀 𝐁єαυтιƒυℓ 𝐍єω 𝐃αу 𝐇αѕ "
-                    "𝐀яяινє∂. 𝐌αу 𝐓нιѕ 𝐃αу 𝐁яιηɢ "
-                    "𝐄η∂ℓєѕѕ 𝐎ρρσятυηιтιєѕ, 𝐉σу, αη∂ "
-                    "𝐒υ¢¢єѕѕ тσ 𝐘συя 𝐋ιƒє.**\n\n"
+                    "**✨ ᴧ ʙᴇᴧυᴛɪғυʟ ηᴇᴡ ∂ᴧʏ нᴧѕ "
+                    "ᴧʀʀɪνᴇ∂. мᴧʏ ᴛнɪѕ ∂ᴧʏ ʙʀɪηɢ "
+                    "ᴇη∂ʟᴇѕѕ σᴘᴘσʀᴛυηɪᴛɪᴇѕ, ᴊσʏ, ᴧη∂ "
+                    "ѕυᴄᴄᴇѕѕ ᴛσ ʏσυʀ ʟɪғᴇ.**\n\n"
 
-                    "**🔓 𝐆яσυρ 𝐈ѕ 𝐍σω 𝐎ρєη.**\n\n"
+                    "**🔓 ɢʀσυᴘ ɪѕ ησω σᴘᴇη.**\n\n"
 
-                    "**• 𝐅єєℓ 𝐅яєє тσ 𝐂нαт, 𝐒нαяє, αη∂ "
-                    "𝐒тαу 𝐏σѕιтινє!**\n\n"
+                    "**• ғᴇᴇʟ ғʀᴇᴇ ᴛσ ᴄнᴧᴛ, ѕнᴧʀᴇ, ᴧη∂ "
+                    "ѕᴛᴧʏ ᴘσѕɪᴛɪνᴇ!**\n\n"
 
-                    # GROUP DETAILS
-                    f"**👥 𝐆яσυρ 𝐍αмє : {group_name}**\n"
-                    f"**🆔 𝐆яσυρ 𝐈𝐃 : `{chat_id}`**\n\n"
+                    f"**👥 ɢʀσυᴘ ηᴧмᴇ : {group_name}**\n"
+                    f"**🆔 ɢʀσυᴘ ɪ∂ : `{chat_id}`**\n\n"
 
-                    # POWERED BY
-                    "**⚡ 𝐏σωєяє∂ 𝐁у : "
-                    "[𝐊ιятι 𝐌υѕι¢](https://t.me/annu_updates)**"
+                    "**⚡ ᴘσωᴇʀᴇ∂ ʙʏ : "
+                    "[κɪʀᴛɪ мυѕɪᴄ](https://t.me/annu_updates)**"
                 ),
 
                 parse_mode=enums.ParseMode.MARKDOWN,
