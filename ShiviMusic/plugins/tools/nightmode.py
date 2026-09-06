@@ -63,7 +63,7 @@ buttons = InlineKeyboardMarkup(
                 callback_data="add_night"
             ),
             InlineKeyboardButton(
-                "๏ ∂ɪѕᴧʙʟᴇ ๏",
+                "๏ ᴅɪѕᴧʙʟᴇ ๏",
                 callback_data="rm_night"
             )
         ]
@@ -79,7 +79,7 @@ NIGHT_MSG_BUTTONS = InlineKeyboardMarkup(
     [
         [
             InlineKeyboardButton(
-                "ᴧ∂∂ мᴇ ɪη ʏσυʀ ɢʀσυᴘ",
+                "ᴧᴅᴅ мᴇ ɪη ʏσυʀ ɢʀσυᴘ",
                 url=f"https://t.me/{app.username}?startgroup=true"
             )
         ]
@@ -98,7 +98,7 @@ async def _nightmode(_, message):
         photo="https://n.uguu.se/PbzKsnAJ.jpg",
 
         caption=(
-            "**⚙️ ɴɪɢнᴛмσ∂ᴇ ѕᴇᴛᴛɪηɢѕ**\n\n"
+            "**⚙️ ɴɪɢнᴛмσᴅᴇ ѕᴇᴛᴛɪηɢѕ**\n\n"
             "**ᴄʟɪᴄκ ᴛнᴇ ʙυᴛᴛσηѕ ʙᴇʟσω ᴛσ ᴄσηᴛʀσʟ "
             "ɴɪɢнᴛмσ∂ᴇ ѕᴇᴛᴛɪηɢѕ ғσʀ ᴛнɪѕ ɢʀσυᴘ.**"
         ),
@@ -135,7 +135,7 @@ async def nightcb(_, query: CallbackQuery):
 
     if user_id not in administrators:
         return await query.answer(
-            "❌ σηʟʏ ᴧ∂мɪηѕ ᴄᴧη υѕᴇ ᴛнɪѕ ᴄσммᴧη∂!",
+            "❌ σηʟʏ ᴧᴅмɪηѕ ᴄᴧη υѕᴇ ᴛнɪѕ ᴄσммᴧηᴅ!",
             show_alert=True
         )
 
@@ -149,7 +149,7 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**🌕 ɴɪɢнᴛмσ∂ᴇ ɪѕ ᴧʟʀᴇᴧ∂ʏ "
+                    "**🌕 ɴɪɢнᴛмσᴅᴇ ɪѕ ᴧʟʀᴇᴧᴅʏ "
                     "ᴇηᴧʙʟᴇ∂ ɪη ᴛнɪѕ ɢʀσυᴘ.**"
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN,
@@ -162,7 +162,7 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**✅ ɴɪɢнᴛмσ∂ᴇ ᴧᴄᴛɪνᴧᴛᴇ∂!**\n\n"
+                    "**✅ ɴɪɢнᴛмσᴅᴇ ᴧᴄᴛɪνᴧᴛᴇᴅ!**\n\n"
                     "**ᴛнɪѕ ɢʀσυᴘ ᴡɪʟʟ ᴧυᴛσмᴧᴛɪᴄᴧʟʟʏ "
                     "ʟσᴄκ ᴧᴛ 𝟏𝟐:𝟎𝟎 ᴧм & υηʟσᴄκ ᴧᴛ "
                     "𝟎𝟔:𝟎𝟎 ᴧм [ɪѕᴛ].**"
@@ -182,7 +182,7 @@ async def nightcb(_, query: CallbackQuery):
             await nightmode_off(chat_id)
 
             await query.message.edit_caption(
-                caption="**❌ ɴɪɢнᴛмσ∂ᴇ ∂ᴇᴧᴄᴛɪνᴧᴛᴇ∂!**",
+                caption="**❌ ɴɪɢнᴛмσᴅᴇ ᴅᴇᴧᴄᴛɪνᴧᴛᴇᴅ!**",
                 parse_mode=enums.ParseMode.MARKDOWN,
                 reply_markup=buttons
             )
@@ -191,7 +191,7 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**🌑 ɴɪɢнᴛмσ∂ᴇ ɪѕ ᴧʟʀᴇᴧ∂ʏ "
+                    "**🌑 ɴɪɢнᴛмσᴅᴇ ɪѕ ᴧʟʀᴇᴧᴅʏ "
                     "ᴛυʀηᴇ∂ σғғ.**"
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN,
@@ -225,24 +225,24 @@ async def start_nightmode():
                 photo="https://d.uguu.se/agsYnJwN.jpg",
 
                 caption=(
-                    "**🌌 ɢσσ∂ ɴɪɢнᴛ ᴇνᴇʀʏσηᴇ!**\n"
+                    "**🌌 ɢσσᴅ ɴɪɢнᴛ ᴇνᴇʀʏσηᴇ!**\n"
                     "**━─────────────────━**\n\n"
 
                     "**✨ ᴛɪмᴇ ᴛσ ᴛυʀη σғғ ʏσυʀ ѕᴄʀᴇᴇηѕ "
-                    "ᴧη∂ ᴄᴧᴛᴄн ѕσмᴇ ᴘᴇᴧᴄᴇғυʟ ∂ʀᴇᴧмѕ. "
-                    "мᴧʏ ʏσυʀ ѕʟᴇᴇᴘ ʙᴇ ѕᴡᴇᴇᴛ ᴧη∂ "
+                    "ᴧηᴅ ᴄᴧᴛᴄн ѕσмᴇ ᴘᴇᴧᴄᴇғυʟ ᴅʀᴇᴧмѕ. "
+                    "мᴧʏ ʏσυʀ ѕʟᴇᴇᴘ ʙᴇ ѕᴡᴇᴇᴛ ᴧηᴅ "
                     "ʀᴇѕᴛғυʟ.**\n\n"
 
-                    "**🔒 ɢʀσυᴘ ɪѕ ησω ᴄʟσѕᴇ∂.**\n\n"
+                    "**🔒 ɢʀσυᴘ ɪѕ ησω ᴄʟσѕᴇᴅ.**\n\n"
 
                     "**• ησ мᴇѕѕᴧɢᴇѕ ᴄᴧη ʙᴇ ѕᴇηᴛ "
                     "υηᴛɪʟ мσʀηɪηɢ. ѕᴇᴇ ʏσυ ᴧʟʟ "
                     "ᴛσмσʀʀσω!**\n\n"
 
                     f"**👥 ɢʀσυᴘ ηᴧмᴇ : {group_name}**\n"
-                    f"**🆔 ɢʀσυᴘ ɪ∂ : `{chat_id}`**\n\n"
+                    f"**🆔 ɢʀσυᴘ ɪᴅ : `{chat_id}`**\n\n"
 
-                    "**⚡ ᴘσωᴇʀᴇ∂ ʙʏ : "
+                    "**⚡ ᴘσωᴇʀᴇᴅ ʙʏ : "
                     "[κɪʀᴛɪ мυѕɪᴄ](https://t.me/annu_updates)**"
                 ),
 
@@ -286,23 +286,23 @@ async def close_nightmode():
                 photo="https://n.uguu.se/ulpfbxJW.jpg",
 
                 caption=(
-                    "**🌅 ɢσσ∂ мσʀηɪηɢ ᴇνᴇʀʏσηᴇ..!**\n"
+                    "**🌅 ɢσσᴅ мσʀηɪηɢ ᴇνᴇʀʏσηᴇ..!**\n"
                     "**━─────────────────━**\n\n"
 
-                    "**✨ ᴧ ʙᴇᴧυᴛɪғυʟ ηᴇᴡ ∂ᴧʏ нᴧѕ "
-                    "ᴧʀʀɪνᴇ∂. мᴧʏ ᴛнɪѕ ∂ᴧʏ ʙʀɪηɢ "
-                    "ᴇη∂ʟᴇѕѕ σᴘᴘσʀᴛυηɪᴛɪᴇѕ, ᴊσʏ, ᴧη∂ "
+                    "**✨ ᴧ ʙᴇᴧυᴛɪғυʟ ηᴇᴡ ᴅᴧʏ нᴧѕ "
+                    "ᴧʀʀɪνᴇᴅ. мᴧʏ ᴛнɪѕ ᴅᴧʏ ʙʀɪηɢ "
+                    "ᴇηᴅʟᴇѕѕ σᴘᴘσʀᴛυηɪᴛɪᴇѕ, ᴊσʏ, ᴧη∂ "
                     "ѕυᴄᴄᴇѕѕ ᴛσ ʏσυʀ ʟɪғᴇ.**\n\n"
 
                     "**🔓 ɢʀσυᴘ ɪѕ ησω σᴘᴇη.**\n\n"
 
-                    "**• ғᴇᴇʟ ғʀᴇᴇ ᴛσ ᴄнᴧᴛ, ѕнᴧʀᴇ, ᴧη∂ "
+                    "**• ғᴇᴇʟ ғʀᴇᴇ ᴛσ ᴄнᴧᴛ, ѕнᴧʀᴇ, ᴧηᴅ "
                     "ѕᴛᴧʏ ᴘσѕɪᴛɪνᴇ!**\n\n"
 
                     f"**👥 ɢʀσυᴘ ηᴧмᴇ : {group_name}**\n"
-                    f"**🆔 ɢʀσυᴘ ɪ∂ : `{chat_id}`**\n\n"
+                    f"**🆔 ɢʀσυᴘ ɪᴅ : `{chat_id}`**\n\n"
 
-                    "**⚡ ᴘσωᴇʀᴇ∂ ʙʏ : "
+                    "**⚡ ᴘσωᴇʀᴇᴅ ʙʏ : "
                     "[κɪʀᴛɪ мυѕɪᴄ](https://t.me/annu_updates)**"
                 ),
 
