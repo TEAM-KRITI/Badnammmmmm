@@ -1,20 +1,12 @@
 # -----------------------------------------------
 # 🔸 CharviMusic Project
-# 🔹 Developed & Maintained by: Charvi Bots (https://github.com/CharviBots)
+# 🔹 Developed & Maintained by: Charvi Bots
 # 📅 Copyright © 2022 – All Rights Reserved
-#
-# 📖 License:
-# This source code is open for educational and non-commercial use ONLY.
-# You are required to retain this credit in all copies or substantial portions of this file.
-# Commercial use, redistribution, or removal of this notice is stric
-# without prior written permission from the author.
-#
-# ❤️ Made with dedication and love by CharviBots
 # -----------------------------------------------
 
 import random
 
-from pyrogram import filters, Client, enums
+from pyrogram import filters, enums
 from ShiviMusic import app
 
 from pyrogram.types import (
@@ -147,7 +139,10 @@ async def nightcb(_, query: CallbackQuery):
             show_alert=True
         )
 
+    # ===================================================
     # ENABLE
+    # ===================================================
+
     if data == "add_night":
 
         if check_night:
@@ -170,13 +165,16 @@ async def nightcb(_, query: CallbackQuery):
                     "**✅ 𝐍ιɢнтмσ∂є 𝐀¢тιναтє∂!**\n\n"
                     "**𝐓нιѕ 𝐆яσυρ 𝐖ιℓℓ 𝐀υтσмαтι¢αℓℓу "
                     "𝐋σ¢к 𝐀т 𝟏𝟐:𝟎𝟎 𝐀𝐌 & 𝐔ηℓσ¢к 𝐀т "
-                    "𝟎𝟔:𝟎𝟎 𝐀𝐌 [𝐈𝐒𝐓] тσ 𝐌αιηтαιη 𝐏єα¢є.**"
+                    "𝟎𝟔:𝟎𝟎 𝐀𝐌 [𝐈𝐒𝐓].**"
                 ),
                 parse_mode=enums.ParseMode.MARKDOWN,
                 reply_markup=buttons
             )
 
+    # ===================================================
     # DISABLE
+    # ===================================================
+
     elif data == "rm_night":
 
         if check_night:
@@ -216,7 +214,7 @@ async def start_nightmode():
         chat_id = int(chat["chat_id"])
 
         try:
-            # Get actual group information
+
             group = await app.get_chat(chat_id)
 
             group_name = group.title or "𝐔ηкησωη 𝐆яσυρ"
@@ -230,18 +228,22 @@ async def start_nightmode():
                     "**🌌 𝐆σσ∂ 𝐍ιɢнт 𝐄νєяуσηє!**\n"
                     "**━─────────────────━**\n\n"
 
+                    "**✨ 𝐓ιмє тσ 𝐓υяη 𝐎ƒƒ 𝐘συя 𝐒¢яєєηѕ "
+                    "αη∂ 𝐂αт¢н 𝐒σмє 𝐏єα¢єƒυℓ 𝐃яєαмѕ. "
+                    "𝐌αу 𝐘συя 𝐒ℓєєρ 𝐁є 𝐒ωєєт αη∂ "
+                    "𝐑єѕтƒυℓ.**\n\n"
+
+                    "**🔒 𝐆яσυρ 𝐈ѕ 𝐍σω 𝐂ℓσѕє∂.**\n\n"
+
+                    "**• 𝐍σ 𝐌єѕѕαɢєѕ 𝐂αη 𝐁є 𝐒єηт "
+                    "𝐔ηтιℓ 𝐌σяηιηɢ. 𝐒єє 𝐘συ 𝐀ℓℓ "
+                    "𝐓σмσяяσω!**\n\n"
+
+                    # GROUP DETAILS
                     f"**👥 𝐆яσυρ 𝐍αмє : {group_name}**\n"
                     f"**🆔 𝐆яσυρ 𝐈𝐃 : `{chat_id}`**\n\n"
 
-                    "**✨ 𝐓ιмє тσ 𝐓υяη 𝐎ƒƒ 𝐘συя 𝐒¢яєєηѕ "
-                    "αη∂ 𝐂αт¢н 𝐒σмє 𝐏єα¢єƒυℓ 𝐃яєαмѕ. "
-                    "𝐌αу 𝐘συя 𝐒ℓєєρ 𝐁є 𝐒ωєєт αη∂ 𝐑єѕтƒυℓ.**\n\n"
-
-                    "**🔒 𝐆яσυρ 𝐈ѕ 𝐍σω 𝐂ℓσѕє∂.**\n"
-
-                    "**• 𝐍σ 𝐌єѕѕαɢєѕ 𝐂αη 𝐁є 𝐒єηт "
-                    "𝐔ηтιℓ 𝐌σяηιηɢ. 𝐒єє 𝐘συ 𝐀ℓℓ 𝐓σмσяяσω!**\n\n"
-
+                    # POWERED BY
                     "**⚡ 𝐏σωєяє∂ 𝐁у : "
                     "[𝐊ιятι 𝐌υѕι¢](https://t.me/annu_updates)**"
                 ),
@@ -275,7 +277,7 @@ async def close_nightmode():
         chat_id = int(chat["chat_id"])
 
         try:
-            # Get actual group information
+
             group = await app.get_chat(chat_id)
 
             group_name = group.title or "𝐔ηкησωη 𝐆яσυρ"
@@ -289,19 +291,21 @@ async def close_nightmode():
                     "**🌅 𝐆σσ∂ 𝐌σяηιηɢ 𝐄νєяуσηє..!**\n"
                     "**━─────────────────━**\n\n"
 
-                    f"**👥 𝐆яσυρ 𝐍αмє : {group_name}**\n"
-                    f"**🆔 𝐆яσυρ 𝐈𝐃 : `{chat_id}`**\n\n"
-
                     "**✨ 𝐀 𝐁єαυтιƒυℓ 𝐍єω 𝐃αу 𝐇αѕ "
                     "𝐀яяινє∂. 𝐌αу 𝐓нιѕ 𝐃αу 𝐁яιηɢ "
                     "𝐄η∂ℓєѕѕ 𝐎ρρσятυηιтιєѕ, 𝐉σу, αη∂ "
                     "𝐒υ¢¢єѕѕ тσ 𝐘συя 𝐋ιƒє.**\n\n"
 
-                    "**🔓 𝐆яσυρ 𝐈ѕ 𝐍σω 𝐎ρєη.**\n"
+                    "**🔓 𝐆яσυρ 𝐈ѕ 𝐍σω 𝐎ρєη.**\n\n"
 
                     "**• 𝐅єєℓ 𝐅яєє тσ 𝐂нαт, 𝐒нαяє, αη∂ "
                     "𝐒тαу 𝐏σѕιтινє!**\n\n"
 
+                    # GROUP DETAILS
+                    f"**👥 𝐆яσυρ 𝐍αмє : {group_name}**\n"
+                    f"**🆔 𝐆яσυρ 𝐈𝐃 : `{chat_id}`**\n\n"
+
+                    # POWERED BY
                     "**⚡ 𝐏σωєяє∂ 𝐁у : "
                     "[𝐊ιятι 𝐌υѕι¢](https://t.me/annu_updates)**"
                 ),
@@ -330,6 +334,7 @@ scheduler = AsyncIOScheduler(
     timezone="Asia/Kolkata"
 )
 
+# 11:59 PM
 scheduler.add_job(
     start_nightmode,
     trigger="cron",
@@ -337,6 +342,7 @@ scheduler.add_job(
     minute=59
 )
 
+# 06:01 AM
 scheduler.add_job(
     close_nightmode,
     trigger="cron",
