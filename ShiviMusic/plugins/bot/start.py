@@ -10,7 +10,7 @@ import time
 import random
 from pyrogram import filters
 from pyrogram.enums import ChatType
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import ChatJoinRequest, InlineKeyboardButton, InlineKeyboardMarkup, Message
 from py_yt import VideosSearch
 
 import config
@@ -35,14 +35,14 @@ from strings import get_string
 
 
 shivi_PIC = [
-    "https://files.catbox.moe/4ojtc4.jpg",
-    "https://files.catbox.moe/30wg78.jpg",
-    "https://files.catbox.moe/4ojtc4.jpg",
-    "https://files.catbox.moe/30wg78.jpg",
-    "https://files.catbox.moe/4ojtc4.jpg",
-    "https://files.catbox.moe/30wg78.jpg",
-    "https://files.catbox.moe/4ojtc4.jpg",
-    "https://files.catbox.moe/30wg78.jpg"
+    "https://n.uguu.se/COCvZVmH.jpg",
+    "https://n.uguu.se/sUnCjERi.jpg",
+    "https://h.uguu.se/UFespaut.jpg",
+    "https://n.uguu.se/JQCcgtmE.jpg",
+    "https://d.uguu.se/SDjTEpEk.jpg",
+    "https://n.uguu.se/FzOLVSlF.jpg",
+    "https://n.uguu.se/QnLMTcYx.jpg",
+    "https://d.uguu.se/aOQGWHbN.jpg"
 ]
 
 
@@ -129,6 +129,71 @@ async def start_pm(client, message: Message, _):
                 chat_id=config.LOGGER_ID,
                 text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
             )
+
+
+# ======================================================
+# 📩 JOIN REQUEST → PRIVATE WELCOME
+# Sends the same kind of welcome card when a user requests
+# to join a group/channel where this bot is an administrator.
+# ======================================================
+@app.on_chat_join_request()
+async def join_request_welcome(client, request: ChatJoinRequest):
+    user = request.from_user
+    if not user:
+        return
+
+    try:
+        language = await get_lang(request.chat.id)
+        _ = get_string(language)
+
+        # Telegram provides a temporary chat id for contacting a
+        # user who has just sent a join request. Use it when available.
+        user_chat_id = getattr(request, "user_chat_id", None) or user.id
+        group_title = request.chat.title or "this group"
+
+        caption = (
+            f"<b>Welcome, {user.mention} 🇮🇳</b>\n\n"
+            f"Your request to join <b>{group_title}</b> "
+            f"has been received. ✅\n\n"
+            f"While you wait, explore — <b>{app.mention}</b> 🎶\n\n"
+            f"• High Quality Music\n"
+            f"• Fast & Smooth Playback\n"
+            f"• Stable Experience\n\n"
+            f"Use /start to begin."
+        )
+
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        text=_['S_B_14'],
+                        callback_data="abot_cb",
+                    )
+                ],
+                [
+                    InlineKeyboardButton(
+                        text=_['S_B_6'],
+                        url=config.SUPPORT_CHANNEL,
+                    ),
+                    InlineKeyboardButton(
+                        text=_['S_B_9'],
+                        url=config.SUPPORT_CHAT,
+                    ),
+                ],
+            ]
+        )
+
+        await app.send_photo(
+            chat_id=user_chat_id,
+            photo=random.choice(shivi_PIC),
+            has_spoiler=True,
+            caption=caption,
+            reply_markup=keyboard,
+        )
+
+    except Exception as ex:
+        print(f"[JOIN REQUEST] {ex}")
+
 
 @app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
