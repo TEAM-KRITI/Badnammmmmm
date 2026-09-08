@@ -4,8 +4,8 @@ import random
 from pyrogram import enums
 from pyrogram.types import InlineKeyboardButton
 
-from AarumiMusic.utils.formatters import time_to_seconds
-from AarumiMusic import app
+from ShiviMusic.utils.formatters import time_to_seconds
+from ShiviMusic import app
 
 
 STYLES = [
@@ -245,7 +245,7 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
             InlineKeyboardButton(
                 text=_["P_B_1"],
                 callback_data=(
-                    f"LuckyPlaylists "
+                    f"ShiviPlaylists "
                     f"{videoid}|{user_id}|{ptype}|a|{channel}|{fplay}"
                 ),
                 style=group_style,
@@ -253,7 +253,7 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
             InlineKeyboardButton(
                 text=_["P_B_2"],
                 callback_data=(
-                    f"LuckyPlaylists "
+                    f"ShiviPlaylists "
                     f"{videoid}|{user_id}|{ptype}|v|{channel}|{fplay}"
                 ),
                 style=group_style,
