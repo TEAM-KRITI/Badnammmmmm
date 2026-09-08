@@ -704,7 +704,7 @@ async def greet_new_member(
 
     async def delete_welcome():
 
-        await asyncio.sleep(10)
+        await asyncio.sleep(200)
 
         try:
 
