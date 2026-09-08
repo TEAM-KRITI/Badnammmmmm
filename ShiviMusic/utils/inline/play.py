@@ -102,7 +102,7 @@ def stream_markup_timer(_, chat_id, played, dur):
         [
             InlineKeyboardButton(
                 text=f"{played} {bar} {remaining}",
-                callback_data="api_status",
+                callback_data="bot_info_data",
                 style=style_progress,
             ),
         ],
@@ -141,7 +141,7 @@ def stream_markup_timer(_, chat_id, played, dur):
             ),
             InlineKeyboardButton(
                 text="ɪɴғᴏ",
-                callback_data="api_status",
+                callback_data="bot_info_data",
                 style=style_seek,
             ),
             InlineKeyboardButton(
