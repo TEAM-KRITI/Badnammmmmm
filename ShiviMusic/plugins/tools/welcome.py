@@ -5,6 +5,7 @@
 import os
 import asyncio
 from logging import getLogger
+from urllib.parse import quote
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont
@@ -458,9 +459,7 @@ async def greet_new_member(
         else None
     )
 
-    new_status = (
-        member.new_chat_member.status
-    )
+    new_status = member.new_chat_member.status
 
     old_statuses = (
         None,
@@ -485,9 +484,7 @@ async def greet_new_member(
     # DOWNLOAD PROFILE PHOTO
     # ---------------------------------------------------
 
-    pic = (
-        "ShiviMusic/assets/upic.png"
-    )
+    pic = "ShiviMusic/assets/upic.png"
 
     try:
 
@@ -496,13 +493,9 @@ async def greet_new_member(
             and user.photo.big_file_id
         ):
 
-            downloaded = (
-                await app.download_media(
-                    user.photo.big_file_id,
-                    file_name=(
-                        f"downloads/pp{user.id}.png"
-                    ),
-                )
+            downloaded = await app.download_media(
+                user.photo.big_file_id,
+                file_name=f"downloads/pp{user.id}.png",
             )
 
             if downloaded:
@@ -629,12 +622,28 @@ async def greet_new_member(
 """
 
     # ===================================================
-    # USER PROFILE URL
+    # VIEW PROFILE URL
+    # ===================================================
+    #
+    # Username available:
+    #     https://t.me/username
+    #
+    # No username:
+    #     tg://user?id=USER_ID
+    #
     # ===================================================
 
-    profile_url = (
-        f"tg://user?id={user.id}"
-    )
+    if user.username:
+
+        profile_url = (
+            f"https://t.me/{user.username}"
+        )
+
+    else:
+
+        profile_url = (
+            f"tg://user?id={user.id}"
+        )
 
     # ===================================================
     # BOT USERNAME
@@ -671,7 +680,7 @@ async def greet_new_member(
 
     # ===================================================
     # BUTTONS
-    # ===================================================
+    # =======================================================
 
     buttons = InlineKeyboardMarkup(
         [
