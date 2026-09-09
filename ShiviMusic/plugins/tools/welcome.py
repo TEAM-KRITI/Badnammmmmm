@@ -23,6 +23,7 @@ from config import MONGO_DB_URI
 
 LOGGER = getLogger(__name__)
 
+
 # =======================================================
 # DATABASE
 # =======================================================
@@ -550,12 +551,6 @@ async def greet_new_member(
             else "ɴ/ᴀ"
         )
 
-        chat_username = (
-            chat.username
-            if chat.username
-            else None
-        )
-
     except Exception as e:
 
         LOGGER.warning(
@@ -564,7 +559,6 @@ async def greet_new_member(
 
         chat_title = "ɢʀᴏᴜᴘ"
         members_count = "ɴ/ᴀ"
-        chat_username = None
 
     # ---------------------------------------------------
     # CREATE WELCOME IMAGE
@@ -635,21 +629,45 @@ async def greet_new_member(
 """
 
     # ===================================================
-    # VIEW MEMBERS URL
+    # USER PROFILE URL
     # ===================================================
 
-    if chat_username:
+    profile_url = (
+        f"tg://user?id={user.id}"
+    )
 
-        view_members_url = (
-            f"https://t.me/{chat_username}"
+    # ===================================================
+    # BOT USERNAME
+    # ===================================================
+
+    try:
+
+        me = await app.get_me()
+
+        bot_username = me.username
+
+    except Exception as e:
+
+        LOGGER.warning(
+            f"Bot username error: {e}"
+        )
+
+        bot_username = None
+
+    # ===================================================
+    # ADD ME URL
+    # ===================================================
+
+    if bot_username:
+
+        add_me_url = (
+            f"https://t.me/{bot_username}"
+            f"?startgroup=true"
         )
 
     else:
 
-        view_members_url = (
-            f"https://t.me/c/"
-            f"{str(chat_id).replace('-100', '')}"
-        )
+        add_me_url = "https://t.me/"
 
     # ===================================================
     # BUTTONS
@@ -659,18 +677,14 @@ async def greet_new_member(
         [
             [
                 InlineKeyboardButton(
-                    "👥 ᴠɪᴇᴡ ᴍᴇᴍʙᴇʀs",
-                    url=view_members_url,
+                    "👤 ᴠɪᴇᴡ ᴘʀᴏғɪʟᴇ",
+                    url=profile_url,
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "➕ ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-                    url=(
-                        f"https://t.me/"
-                        f"{app.username}"
-                        f"?startgroup=true"
-                    ),
+                    "➕ ᴀᴅᴅ ᴍᴇ",
+                    url=add_me_url,
                 )
             ],
         ]
@@ -699,7 +713,7 @@ async def greet_new_member(
         return
 
     # ===================================================
-    # AUTO DELETE AFTER 10 SECONDS
+    # AUTO DELETE AFTER 200 SECONDS
     # ===================================================
 
     async def delete_welcome():
