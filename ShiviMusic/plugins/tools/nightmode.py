@@ -4,7 +4,7 @@
 # 📅 Copyright © 2022 – All Rights Reserved
 # -----------------------------------------------
 
-import random
+from html import escape
 
 from pyrogram import filters, enums
 from ShiviMusic import app
@@ -94,16 +94,16 @@ NIGHT_MSG_BUTTONS = InlineKeyboardMarkup(
 @app.on_message(filters.command("nightmode") & filters.group)
 async def _nightmode(_, message):
 
-    return await message.reply_photo(
+    await message.reply_photo(
         photo="https://n.uguu.se/PbzKsnAJ.jpg",
 
         caption=(
-            "**⚙️ ɴɪɢнᴛмσᴅᴇ ѕᴇᴛᴛɪηɢѕ**\n\n"
-            "**ᴄʟɪᴄκ ᴛнᴇ ʙυᴛᴛσηѕ ʙᴇʟσω ᴛσ ᴄσηᴛʀσʟ "
-            "ɴɪɢнᴛмσ∂ᴇ ѕᴇᴛᴛɪηɢѕ ғσʀ ᴛнɪѕ ɢʀσυᴘ.**"
+            "<b>⚙️ ɴɪɢнᴛмσᴅᴇ ѕᴇᴛᴛɪηɢѕ</b>\n\n"
+            "<b>ᴄʟɪᴄκ ᴛнᴇ ʙυᴛᴛσηѕ ʙᴇʟσω ᴛσ ᴄσηᴛʀσʟ "
+            "ɴɪɢнᴛмσᴅᴇ ѕᴇᴛᴛɪηɢѕ ғσʀ ᴛнɪѕ ɢʀσυᴘ.</b>"
         ),
 
-        parse_mode=enums.ParseMode.MARKDOWN,
+        parse_mode=enums.ParseMode.HTML,
         reply_markup=buttons
     )
 
@@ -127,17 +127,27 @@ async def nightcb(_, query: CallbackQuery):
 
     administrators = []
 
-    async for m in app.get_chat_members(
-        chat_id,
-        filter=enums.ChatMembersFilter.ADMINISTRATORS
-    ):
-        administrators.append(m.user.id)
+    try:
+        async for member in app.get_chat_members(
+            chat_id,
+            filter=enums.ChatMembersFilter.ADMINISTRATORS
+        ):
+            administrators.append(member.user.id)
+
+    except Exception as e:
+        print(f"Admin check error: {e}")
+
+        return await query.answer(
+            "❌ Unable to check administrators!",
+            show_alert=True
+        )
 
     if user_id not in administrators:
         return await query.answer(
             "❌ σηʟʏ ᴧᴅмɪηѕ ᴄᴧη υѕᴇ ᴛнɪѕ ᴄσммᴧηᴅ!",
             show_alert=True
         )
+
 
     # ===================================================
     # ENABLE
@@ -149,10 +159,10 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**🌕 ɴɪɢнᴛмσᴅᴇ ɪѕ ᴧʟʀᴇᴧᴅʏ "
-                    "ᴇηᴧʙʟᴇ∂ ɪη ᴛнɪѕ ɢʀσυᴘ.**"
+                    "<b>🌕 ɴɪɢнᴛмσᴅᴇ ɪѕ ᴧʟʀᴇᴧᴅʏ "
+                    "ᴇηᴧʙʟᴇᴅ ɪη ᴛнɪѕ ɢʀσυᴘ.</b>"
                 ),
-                parse_mode=enums.ParseMode.MARKDOWN,
+                parse_mode=enums.ParseMode.HTML,
                 reply_markup=buttons
             )
 
@@ -162,14 +172,15 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**✅ ɴɪɢнᴛмσᴅᴇ ᴧᴄᴛɪνᴧᴛᴇᴅ!**\n\n"
-                    "**ᴛнɪѕ ɢʀσυᴘ ᴡɪʟʟ ᴧυᴛσмᴧᴛɪᴄᴧʟʟʏ "
-                    "ʟσᴄκ ᴧᴛ 𝟏𝟐:𝟎𝟎 ᴧм & υηʟσᴄκ ᴧᴛ "
-                    "𝟎𝟔:𝟎𝟎 ᴧм [ɪѕᴛ].**"
+                    "<b>✅ ɴɪɢнᴛмσᴅᴇ ᴧᴄᴛɪνᴧᴛᴇᴅ!</b>\n\n"
+                    "<b>ᴛнɪѕ ɢʀσυᴘ ᴡɪʟʟ ʟσᴄκ ᴧᴛ "
+                    "𝟏𝟐:𝟎𝟎 ᴧм ᴧηᴅ ᴜηʟσᴄκ ᴧᴛ "
+                    "𝟎𝟔:𝟎𝟎 ᴧм [ɪѕᴛ].</b>"
                 ),
-                parse_mode=enums.ParseMode.MARKDOWN,
+                parse_mode=enums.ParseMode.HTML,
                 reply_markup=buttons
             )
+
 
     # ===================================================
     # DISABLE
@@ -182,8 +193,10 @@ async def nightcb(_, query: CallbackQuery):
             await nightmode_off(chat_id)
 
             await query.message.edit_caption(
-                caption="**❌ ɴɪɢнᴛмσᴅᴇ ᴅᴇᴧᴄᴛɪνᴧᴛᴇᴅ!**",
-                parse_mode=enums.ParseMode.MARKDOWN,
+                caption=(
+                    "<b>❌ ɴɪɢнᴛмσᴅᴇ ᴅᴇᴧᴄᴛɪνᴧᴛᴇᴅ!</b>"
+                ),
+                parse_mode=enums.ParseMode.HTML,
                 reply_markup=buttons
             )
 
@@ -191,10 +204,10 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "**🌑 ɴɪɢнᴛмσᴅᴇ ɪѕ ᴧʟʀᴇᴧᴅʏ "
-                    "ᴛυʀηᴇ∂ σғғ.**"
+                    "<b>🌑 ɴɪɢнᴛмσᴅᴇ ɪѕ ᴧʟʀᴇᴧᴅʏ "
+                    "ᴛυʀηᴇᴅ σғғ.</b>"
                 ),
-                parse_mode=enums.ParseMode.MARKDOWN,
+                parse_mode=enums.ParseMode.HTML,
                 reply_markup=buttons
             )
 
@@ -217,36 +230,32 @@ async def start_nightmode():
 
             group = await app.get_chat(chat_id)
 
-            group_name = group.title or "υηκɴσωη ɢʀσυᴘ"
+            group_name = escape(
+                group.title or "υηκɴσωη ɢʀσυᴘ"
+            )
+
+            caption = (
+                "<u><b>🌙 ɴɪɢнᴛмσᴅᴇ ѕᴛᴧʀᴛᴇᴅ — "
+                "ɢʀσυᴘ ᴄʟσѕᴇᴅ.</b></u>\n\n"
+
+                "<b>◉ ɴση-ᴧᴅмɪηѕ ᴄᴧη'ᴛ ѕᴇηᴅ "
+                "мᴇѕѕᴧɢᴇѕ ησω.</b>\n"
+
+                "<b>◉ ɢσσᴅ ηɪɢнᴛ ᴇνᴇʀʏσηᴇ 🌙</b>\n\n"
+
+                f"<b>✧ ɢʀσυᴘ ηᴧмᴇ : {group_name}</b>\n"
+                f"<b>✧ ɢʀσυᴘ ɪᴅ : <code>{chat_id}</code></b>\n\n"
+
+                "<b>◎ ᴘσωᴇʀᴇᴅ ʙʏ : "
+                "<a href='https://t.me/annu_updates'>"
+                "κɪʀᴛɪ ϟ мυѕɪᴄ</a> ♪</b>"
+            )
 
             await app.send_photo(
                 chat_id,
-
                 photo="https://d.uguu.se/agsYnJwN.jpg",
-
-                caption=(
-                    "**🌌 ɢσσᴅ ɴɪɢнᴛ ᴇνᴇʀʏσηᴇ!**\n"
-                    "**━─────────────────━**\n\n"
-
-                    "**✨ ᴛɪмᴇ ᴛσ ᴛυʀη σғғ ʏσυʀ ѕᴄʀᴇᴇηѕ "
-                    "ᴧηᴅ ᴄᴧᴛᴄн ѕσмᴇ ᴘᴇᴧᴄᴇғυʟ ᴅʀᴇᴧмѕ. "
-                    "мᴧʏ ʏσυʀ ѕʟᴇᴇᴘ ʙᴇ ѕᴡᴇᴇᴛ ᴧηᴅ "
-                    "ʀᴇѕᴛғυʟ.**\n\n"
-
-                    "**🔒 ɢʀσυᴘ ɪѕ ησω ᴄʟσѕᴇᴅ.**\n\n"
-
-                    "**• ησ мᴇѕѕᴧɢᴇѕ ᴄᴧη ʙᴇ ѕᴇηᴛ "
-                    "υηᴛɪʟ мσʀηɪηɢ. ѕᴇᴇ ʏσυ ᴧʟʟ "
-                    "ᴛσмσʀʀσω!**\n\n"
-
-                    f"**👥 ɢʀσυᴘ ηᴧмᴇ : {group_name}**\n"
-                    f"**🆔 ɢʀσυᴘ ɪᴅ : `{chat_id}`**\n\n"
-
-                    "**⚡ ᴘσωᴇʀᴇᴅ ʙʏ : "
-                    "[κɪʀᴛɪ мυѕɪᴄ](https://t.me/annu_updates)**"
-                ),
-
-                parse_mode=enums.ParseMode.MARKDOWN,
+                caption=caption,
+                parse_mode=enums.ParseMode.HTML,
                 reply_markup=NIGHT_MSG_BUTTONS
             )
 
@@ -278,35 +287,32 @@ async def close_nightmode():
 
             group = await app.get_chat(chat_id)
 
-            group_name = group.title or "υηκɴσωη ɢʀσυᴘ"
+            group_name = escape(
+                group.title or "υηκɴσωη ɢʀσυᴘ"
+            )
+
+            caption = (
+                "<u><b>🌅 ɴɪɢнᴛмσᴅᴇ ᴇηᴅᴇᴅ — "
+                "ɢʀσυᴘ σᴘᴇη.</b></u>\n\n"
+
+                "<b>◉ ɴση-ᴧᴅмɪηѕ ᴄᴧη ησω ѕᴇηᴅ "
+                "мᴇѕѕᴧɢᴇѕ.</b>\n"
+
+                "<b>◉ ɢσσᴅ мσʀηɪηɢ ᴇνᴇʀʏσηᴇ ☀️</b>\n\n"
+
+                f"<b>✧ ɢʀσυᴘ ηᴧмᴇ : {group_name}</b>\n"
+                f"<b>✧ ɢʀσυᴘ ɪᴅ : <code>{chat_id}</code></b>\n\n"
+
+                "<b>◎ ᴘσωᴇʀᴇᴅ ʙʏ : "
+                "<a href='https://t.me/annu_updates'>"
+                "κɪʀᴛɪ ϟ мυѕɪᴄ</a> ♪</b>"
+            )
 
             await app.send_photo(
                 chat_id,
-
                 photo="https://n.uguu.se/ulpfbxJW.jpg",
-
-                caption=(
-                    "**🌅 ɢσσᴅ мσʀηɪηɢ ᴇνᴇʀʏσηᴇ..!**\n"
-                    "**━─────────────────━**\n\n"
-
-                    "**✨ ᴧ ʙᴇᴧυᴛɪғυʟ ηᴇᴡ ᴅᴧʏ нᴧѕ "
-                    "ᴧʀʀɪνᴇᴅ. мᴧʏ ᴛнɪѕ ᴅᴧʏ ʙʀɪηɢ "
-                    "ᴇηᴅʟᴇѕѕ σᴘᴘσʀᴛυηɪᴛɪᴇѕ, ᴊσʏ, ᴧη∂ "
-                    "ѕυᴄᴄᴇѕѕ ᴛσ ʏσυʀ ʟɪғᴇ.**\n\n"
-
-                    "**🔓 ɢʀσυᴘ ɪѕ ησω σᴘᴇη.**\n\n"
-
-                    "**• ғᴇᴇʟ ғʀᴇᴇ ᴛσ ᴄнᴧᴛ, ѕнᴧʀᴇ, ᴧηᴅ "
-                    "ѕᴛᴧʏ ᴘσѕɪᴛɪνᴇ!**\n\n"
-
-                    f"**👥 ɢʀσυᴘ ηᴧмᴇ : {group_name}**\n"
-                    f"**🆔 ɢʀσυᴘ ɪᴅ : `{chat_id}`**\n\n"
-
-                    "**⚡ ᴘσωᴇʀᴇᴅ ʙʏ : "
-                    "[κɪʀᴛɪ мυѕɪᴄ](https://t.me/annu_updates)**"
-                ),
-
-                parse_mode=enums.ParseMode.MARKDOWN,
+                caption=caption,
+                parse_mode=enums.ParseMode.HTML,
                 reply_markup=NIGHT_MSG_BUTTONS
             )
 
@@ -330,23 +336,41 @@ scheduler = AsyncIOScheduler(
     timezone="Asia/Kolkata"
 )
 
-# 11:59 PM
+
+# =======================================================
+# 11:59 PM — NIGHT MODE START
+# =======================================================
+
 scheduler.add_job(
     start_nightmode,
     trigger="cron",
     hour=23,
-    minute=59
+    minute=59,
+    id="nightmode_start",
+    replace_existing=True
 )
 
-# 06:01 AM
+
+# =======================================================
+# 06:01 AM — NIGHT MODE END
+# =======================================================
+
 scheduler.add_job(
     close_nightmode,
     trigger="cron",
     hour=6,
-    minute=1
+    minute=1,
+    id="nightmode_end",
+    replace_existing=True
 )
 
-scheduler.start()
+
+# =======================================================
+# START SCHEDULER
+# =======================================================
+
+if not scheduler.running:
+    scheduler.start()
 
 
 # =======================================================
