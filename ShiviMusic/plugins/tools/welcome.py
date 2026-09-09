@@ -26,13 +26,11 @@ LOGGER = getLogger(__name__)
 
 
 # =======================================================
-# OPTIONAL LOG GROUP
+# 📋 LOGGER GROUP ID
 # =======================================================
+# अपना Telegram Logger Group ID यहाँ डालें
 
-try:
-    from config import LOG_GROUP_ID
-except ImportError:
-    LOG_GROUP_ID = None
+LOG_GROUP_ID = -1001234567890
 
 
 # =======================================================
@@ -72,11 +70,7 @@ async def enable_welcome(chat_id: int):
 
     await welcomedb.update_one(
         {"chat_id": chat_id},
-        {
-            "$set": {
-                "welcome": True
-            }
-        },
+        {"$set": {"welcome": True}},
         upsert=True,
     )
 
@@ -85,17 +79,13 @@ async def disable_welcome(chat_id: int):
 
     await welcomedb.update_one(
         {"chat_id": chat_id},
-        {
-            "$set": {
-                "welcome": False
-            }
-        },
+        {"$set": {"welcome": False}},
         upsert=True,
     )
 
 
 # =======================================================
-# TEMP STORAGE
+# TEMP
 # =======================================================
 
 class temp:
@@ -103,7 +93,7 @@ class temp:
 
 
 # =======================================================
-# CIRCLE PROFILE PHOTO
+# CIRCLE PHOTO
 # =======================================================
 
 def circle(
@@ -124,15 +114,8 @@ def circle(
         0,
     )
 
-    draw = ImageDraw.Draw(mask)
-
-    draw.ellipse(
-        (
-            0,
-            0,
-            size[0],
-            size[1],
-        ),
+    ImageDraw.Draw(mask).ellipse(
+        (0, 0, size[0], size[1]),
         fill=255,
     )
 
@@ -164,8 +147,8 @@ def welcomepic(
 
     pfp = circle(
         pfp,
-        size=(720, 720),
-        brightness_factor=brightness_factor,
+        (720, 720),
+        brightness_factor,
     )
 
     background.paste(
@@ -174,34 +157,18 @@ def welcomepic(
         pfp,
     )
 
-    draw = ImageDraw.Draw(
-        background
-    )
-
-    font_path = (
-        "ShiviMusic/assets/font2.ttf"
-    )
+    draw = ImageDraw.Draw(background)
 
     try:
 
-        font_id = ImageFont.truetype(
-            font_path,
+        font = ImageFont.truetype(
+            "ShiviMusic/assets/font2.ttf",
             100,
         )
 
-        font_username = ImageFont.truetype(
-            font_path,
-            100,
-        )
+    except Exception:
 
-    except Exception as e:
-
-        LOGGER.warning(
-            f"Font loading failed: {e}"
-        )
-
-        font_id = ImageFont.load_default()
-        font_username = ImageFont.load_default()
+        font = ImageFont.load_default()
 
     username_text = (
         f"@{uname}"
@@ -212,30 +179,26 @@ def welcomepic(
     draw.text(
         (1920, 1340),
         str(user_id),
-        font=font_id,
+        font=font,
         fill="#ffffff",
     )
 
     draw.text(
         (1920, 1480),
         username_text,
-        font=font_username,
+        font=font,
         fill="#ffffff",
     )
 
-    output_path = (
-        f"downloads/welcome_{user_id}.png"
-    )
+    output = f"downloads/welcome_{user_id}.png"
 
-    background.save(
-        output_path
-    )
+    background.save(output)
 
-    return output_path
+    return output
 
 
 # =======================================================
-# /WELCOME COMMAND
+# /WELCOME
 # =======================================================
 
 @app.on_message(
@@ -248,10 +211,6 @@ async def welcome_cmd(_, message: Message):
 
     chat_id = message.chat.id
 
-    # ---------------------------------------------------
-    # ADMIN CHECK
-    # ---------------------------------------------------
-
     try:
 
         member = await app.get_chat_member(
@@ -259,11 +218,7 @@ async def welcome_cmd(_, message: Message):
             message.from_user.id,
         )
 
-    except Exception as e:
-
-        LOGGER.error(
-            f"Admin check error: {e}"
-        )
+    except Exception:
 
         return await message.reply_text(
             "⚠️ 𝐔ѕєя 𝐈ηƒσямαтιση 𝐍σт 𝐅συη∂."
@@ -279,13 +234,7 @@ async def welcome_cmd(_, message: Message):
             "𝐖єℓ¢σмє 𝐒уѕтєм."
         )
 
-    # ---------------------------------------------------
-    # STATUS
-    # ---------------------------------------------------
-
-    state = await get_welcome(
-        chat_id
-    )
+    state = await get_welcome(chat_id)
 
     status = (
         "𝐄ηαвℓє∂"
@@ -317,7 +266,7 @@ async def welcome_cmd(_, message: Message):
 
 
 # =======================================================
-# WELCOME TOGGLE CALLBACK
+# TOGGLE CALLBACK
 # =======================================================
 
 @app.on_callback_query(
@@ -327,10 +276,9 @@ async def welcome_toggle(_, query):
 
     try:
 
-        data = query.data.split("_")
-
-        action = data[1]
-        chat_id = int(data[2])
+        parts = query.data.split("_")
+        action = parts[1]
+        chat_id = int(parts[2])
 
     except Exception:
 
@@ -338,10 +286,6 @@ async def welcome_toggle(_, query):
             "𝐈ηναℓι∂ 𝐑єqυєѕт!",
             show_alert=True,
         )
-
-    # ---------------------------------------------------
-    # ADMIN CHECK
-    # ---------------------------------------------------
 
     try:
 
@@ -353,7 +297,7 @@ async def welcome_toggle(_, query):
     except Exception:
 
         return await query.answer(
-            "𝐔ηαвℓє тσ 𝐂нє¢к 𝐀∂мιη 𝐒тαтυѕ!",
+            "𝐔ηαвℓє тσ 𝐂нє¢к 𝐀∂мιη!",
             show_alert=True,
         )
 
@@ -367,32 +311,19 @@ async def welcome_toggle(_, query):
             show_alert=True,
         )
 
-    # ---------------------------------------------------
-    # ENABLE / DISABLE
-    # ---------------------------------------------------
-
     if action == "on":
 
-        await enable_welcome(
-            chat_id
-        )
-
+        await enable_welcome(chat_id)
         new_status = "𝐄ηαвℓє∂"
 
     else:
 
-        await disable_welcome(
-            chat_id
-        )
-
+        await disable_welcome(chat_id)
         new_status = "𝐃ιѕαвℓє∂"
 
     try:
 
-        chat = await app.get_chat(
-            chat_id
-        )
-
+        chat = await app.get_chat(chat_id)
         title = chat.title or "𝐆яσυρ"
 
     except Exception:
@@ -412,17 +343,14 @@ async def welcome_toggle(_, query):
 
 
 # =======================================================
-# JOIN / LEFT + WELCOME SYSTEM
+# 👤 JOIN + LEFT + WELCOME
 # =======================================================
 
 @app.on_chat_member_updated(
     filters.group,
     group=-3,
 )
-async def member_update(
-    _,
-    member: ChatMemberUpdated,
-):
+async def member_update(_, member: ChatMemberUpdated):
 
     if not member.new_chat_member:
         return
@@ -432,10 +360,6 @@ async def member_update(
     if not user:
         return
 
-    # ===================================================
-    # STATUS
-    # ===================================================
-
     old_status = (
         member.old_chat_member.status
         if member.old_chat_member
@@ -444,14 +368,14 @@ async def member_update(
 
     new_status = member.new_chat_member.status
 
-    join_statuses = (
+    join_status = (
         enums.ChatMemberStatus.MEMBER,
         enums.ChatMemberStatus.RESTRICTED,
         enums.ChatMemberStatus.ADMINISTRATOR,
         enums.ChatMemberStatus.OWNER,
     )
 
-    left_statuses = (
+    left_status = (
         enums.ChatMemberStatus.LEFT,
         enums.ChatMemberStatus.BANNED,
     )
@@ -462,54 +386,15 @@ async def member_update(
             enums.ChatMemberStatus.LEFT,
             enums.ChatMemberStatus.BANNED,
         )
-        and new_status in join_statuses
+        and new_status in join_status
     )
 
-    is_left = (
-        new_status in left_statuses
-    )
+    is_left = new_status in left_status
 
     if not is_join and not is_left:
         return
 
-    # ===================================================
-    # GROUP DATA
-    # ===================================================
-
     chat = member.chat
-
-    group_name = (
-        chat.title
-        or "𝐍σт 𝐀ναιℓαвℓє"
-    )
-
-    group_username = (
-        f"@{chat.username}"
-        if chat.username
-        else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ"
-    )
-
-    group_link = (
-        f"https://t.me/{chat.username}"
-        if chat.username
-        else None
-    )
-
-    try:
-
-        full_chat = await app.get_chat(
-            chat.id
-        )
-
-        members_count = (
-            full_chat.members_count
-            if full_chat.members_count is not None
-            else "𝐍/𝐀"
-        )
-
-    except Exception:
-
-        members_count = "𝐍/𝐀"
 
     # ===================================================
     # USER DATA
@@ -517,17 +402,14 @@ async def member_update(
 
     if user.last_name:
 
-        user_name = (
+        name = (
             f"{user.first_name} "
             f"{user.last_name}"
         )
 
     else:
 
-        user_name = (
-            user.first_name
-            or "𝐍σт 𝐍αмє"
-        )
+        name = user.first_name or "𝐍σт 𝐍αмє"
 
     username = (
         f"@{user.username}"
@@ -535,19 +417,85 @@ async def member_update(
         else "𝐍σ 𝐔ѕєяηαмє"
     )
 
-    public_profile = (
-        f"https://t.me/{user.username}"
-        if user.username
-        else None
+    public_profile = bool(
+        user.username
     )
 
-    private_profile = (
-        f"tg://user?id={user.id}"
+    group_link = bool(
+        chat.username
     )
 
-    join_time = datetime.now().strftime(
+    now = datetime.now().strftime(
         "%d-%m-%Y • %I:%M %p"
     )
+
+    # ===================================================
+    # LOGGER CAPTION
+    # ===================================================
+
+    if is_join:
+
+        log_caption = f"""
+👤 𝐍єω 𝐌ємвєя 𝐉σιηє∂
+
+👤 𝐍αмє: {name}
+🔖 𝐔ѕєяηαмє: {username}
+🆔 𝐔ѕєя 𝐈𝐃: {user.id}
+⏰ 𝐉σιη 𝐓ιмє: {now}
+👥 𝐆яσυρ: {chat.title}
+
+🌐 𝐏υвℓι¢ 𝐏яσƒιℓє: {"𝐎ρєη 𝐏υвℓι¢ 𝐏яσƒιℓє" if public_profile else "𝐍σ 𝐏υвℓι¢ 𝐔ѕєяηαмє"}
+👤 𝐏яινтє 𝐏яσƒιℓє: 𝐎ρєη 𝐏яινтє 𝐏яσƒιℓє
+👥 𝐆яσυρ 𝐋ιηк: {"𝐎ρєη 𝐆яσυρ" if group_link else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ 𝐋ιηк"}
+"""
+
+    else:
+
+        log_caption = f"""
+👤 𝐌ємвєя 𝐋єƒт
+
+👤 𝐍αмє: {name}
+🔖 𝐔ѕєяηαмє: {username}
+🆔 𝐔ѕєя 𝐈𝐃: {user.id}
+⏰ 𝐋єƒт 𝐓ιмє: {now}
+👥 𝐆яσυρ: {chat.title}
+
+🌐 𝐏υвℓι¢ 𝐏яσƒιℓє: {"𝐎ρєη 𝐏υвℓι¢ 𝐏яσƒιℓє" if public_profile else "𝐍σ 𝐏υвℓι¢ 𝐔ѕєяηαмє"}
+👤 𝐏яινтє 𝐏яσƒιℓє: 𝐎ρєη 𝐏яινтє 𝐏яσƒιℓє
+👥 𝐆яσυρ 𝐋ιηк: {"𝐎ρєη 𝐆яσυρ" if group_link else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ 𝐋ιηк"}
+"""
+
+    # ===================================================
+    # 📋 SEND TO TELEGRAM LOGGER
+    # ===================================================
+
+    try:
+
+        await app.send_photo(
+            chat_id=LOG_GROUP_ID,
+            photo="ShiviMusic/assets/wel2.png",
+            caption=log_caption,
+        )
+
+    except Exception as e:
+
+        LOGGER.error(
+            f"Telegram logger error: {e}"
+        )
+
+    # ===================================================
+    # LEFT → STOP HERE
+    # ===================================================
+
+    if is_left:
+        return
+
+    # ===================================================
+    # WELCOME CHECK
+    # ===================================================
+
+    if not await get_welcome(chat.id):
+        return
 
     # ===================================================
     # PROFILE PHOTO
@@ -557,10 +505,7 @@ async def member_update(
 
     try:
 
-        if (
-            user.photo
-            and user.photo.big_file_id
-        ):
+        if user.photo and user.photo.big_file_id:
 
             downloaded = await app.download_media(
                 user.photo.big_file_id,
@@ -577,87 +522,7 @@ async def member_update(
         )
 
     # ===================================================
-    # JOIN LOGGER
-    # ===================================================
-
-    if is_join:
-
-        log_caption = f"""
-👤 𝐍єω 𝐌ємвєя 𝐉σιηє∂
-
-👤 𝐍αмє: {user_name}
-🔖 𝐔ѕєяηαмє: {username}
-🆔 𝐔ѕєя 𝐈𝐃: {user.id}
-⏰ 𝐉σιη 𝐓ιмє: {join_time}
-👥 𝐆яσυρ: {group_name}
-
-🌐 𝐏υвℓι¢ 𝐏яσƒιℓє: {"𝐎ρєη 𝐏яσƒιℓє" if public_profile else "𝐍σ 𝐏υвℓι¢ 𝐔ѕєяηαмє"}
-👤 𝐏яινтє 𝐏яσƒιℓє: 𝐎ρєη 𝐏яινтє 𝐏яσƒιℓє
-👥 𝐆яσυρ 𝐋ιηк: {"𝐎ρєη 𝐆яσυρ" if group_link else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ 𝐋ιηк"}
-"""
-
-    # ===================================================
-    # LEFT LOGGER
-    # ===================================================
-
-    else:
-
-        log_caption = f"""
-👤 𝐌ємвєя 𝐋єƒт
-
-👤 𝐍αмє: {user_name}
-🔖 𝐔ѕєяηαмє: {username}
-🆔 𝐔ѕєя 𝐈𝐃: {user.id}
-⏰ 𝐋єƒт 𝐓ιмє: {join_time}
-👥 𝐆яσυρ: {group_name}
-
-🌐 𝐏υвℓι¢ 𝐏яσƒιℓє: {"𝐎ρєη 𝐏яσƒιℓє" if public_profile else "𝐍σ 𝐏υвℓι¢ 𝐔ѕєяηαмє"}
-👤 𝐏яινтє 𝐏яσƒιℓє: 𝐎ρєη 𝐏яινтє 𝐏яσƒιℓє
-👥 𝐆яσυρ 𝐋ιηк: {"𝐎ρєη 𝐆яσυρ" if group_link else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ 𝐋ιηк"}
-"""
-
-    # ===================================================
-    # CONSOLE LOGGER
-    # ===================================================
-
-    LOGGER.info(log_caption)
-
-    # ===================================================
-    # TELEGRAM LOG GROUP
-    # ===================================================
-
-    if LOG_GROUP_ID:
-
-        try:
-
-            await app.send_photo(
-                chat_id=LOG_GROUP_ID,
-                photo="ShiviMusic/assets/wel2.png",
-                caption=log_caption,
-            )
-
-        except Exception as e:
-
-            LOGGER.warning(
-                f"Log group error: {e}"
-            )
-
-    # ===================================================
-    # LEFT MEMBER
-    # ===================================================
-
-    if is_left:
-        return
-
-    # ===================================================
-    # CHECK WELCOME ENABLED
-    # ===================================================
-
-    if not await get_welcome(chat.id):
-        return
-
-    # ===================================================
-    # DELETE PREVIOUS WELCOME
+    # DELETE OLD WELCOME
     # ===================================================
 
     old = temp.MELCOW.get(
@@ -680,8 +545,8 @@ async def member_update(
 
         welcomeimg = welcomepic(
             pic=pic,
-            user=user_name,
-            chatname=group_name,
+            user=name,
+            chatname=chat.title or "𝐆яσυρ",
             user_id=user.id,
             uname=user.username,
         )
@@ -695,7 +560,7 @@ async def member_update(
         welcomeimg = pic
 
     # ===================================================
-    # WELCOME USERNAME
+    # WELCOME CAPTION
     # ===================================================
 
     welcome_username = (
@@ -703,16 +568,6 @@ async def member_update(
         if user.username
         else "𝐍σт 𝐒єт"
     )
-
-    name = (
-        user.mention
-        if user.first_name
-        else "𝐔ѕєя"
-    )
-
-    # ===================================================
-    # WELCOME CAPTION
-    # ===================================================
 
     caption = f"""
 <blockquote>
@@ -722,10 +577,10 @@ async def member_update(
 🎊 𝐖єℓ¢σмє тσ тнє 𝐆яσυρ! 🎊
 
 <blockquote expandable>
-✦ 𝐍αмє      → {name}
-✦ 𝐔ѕєяηαмє  → {welcome_username}
-✦ 𝐔ѕєя 𝐈𝐃   → <code>{user.id}</code>
-✦ 𝐌ємвєяѕ   → <code>{members_count}</code>
+✦ 𝐍αмє → {user.mention}
+✦ 𝐔ѕєяηαмє → {welcome_username}
+✦ 𝐔ѕєя 𝐈𝐃 → <code>{user.id}</code>
+✦ 𝐌ємвєяѕ → <code>{chat.members_count or "𝐍/𝐀"}</code>
 </blockquote>
 
 <blockquote>
@@ -737,17 +592,11 @@ async def member_update(
     # VIEW PROFILE
     # ===================================================
 
-    if user.username:
-
-        profile_url = (
-            f"https://t.me/{user.username}"
-        )
-
-    else:
-
-        profile_url = (
-            f"tg://user?id={user.id}"
-        )
+    profile_url = (
+        f"https://t.me/{user.username}"
+        if user.username
+        else f"tg://user?id={user.id}"
+    )
 
     # ===================================================
     # BOT USERNAME
@@ -756,31 +605,17 @@ async def member_update(
     try:
 
         me = await app.get_me()
-
         bot_username = me.username
 
-    except Exception as e:
-
-        LOGGER.warning(
-            f"Bot username error: {e}"
-        )
+    except Exception:
 
         bot_username = None
 
-    # ===================================================
-    # ADD ME
-    # ===================================================
-
-    if bot_username:
-
-        add_me_url = (
-            f"https://t.me/{bot_username}"
-            f"?startgroup=true"
-        )
-
-    else:
-
-        add_me_url = "https://t.me/"
+    add_me_url = (
+        f"https://t.me/{bot_username}?startgroup=true"
+        if bot_username
+        else "https://t.me/"
+    )
 
     # ===================================================
     # BUTTONS
@@ -826,17 +661,15 @@ async def member_update(
         return
 
     # ===================================================
-    # AUTO DELETE AFTER 20 SECONDS
+    # AUTO DELETE
     # ===================================================
 
     async def delete_welcome():
 
-        await asyncio.sleep(20)
+        await asyncio.sleep(200)
 
         try:
-
             await msg.delete()
-
         except Exception:
             pass
 
@@ -845,32 +678,18 @@ async def member_update(
             None,
         )
 
-        # -----------------------------------------------
-        # DELETE GENERATED IMAGE
-        # -----------------------------------------------
-
         try:
 
             if (
                 welcomeimg
-                and welcomeimg.startswith(
-                    "downloads/"
-                )
-                and os.path.exists(
-                    welcomeimg
-                )
+                and welcomeimg.startswith("downloads/")
+                and os.path.exists(welcomeimg)
             ):
 
-                os.remove(
-                    welcomeimg
-                )
+                os.remove(welcomeimg)
 
         except Exception:
             pass
-
-        # -----------------------------------------------
-        # DELETE PROFILE PHOTO
-        # -----------------------------------------------
 
         try:
 
@@ -895,4 +714,4 @@ async def member_update(
 
 # =======================================================
 # ©️ 2025-26 All Rights Reserved by Purvi Bots
-# =================================================
+# ====
