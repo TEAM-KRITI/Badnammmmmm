@@ -4,8 +4,8 @@
 
 import os
 import asyncio
+from datetime import datetime
 from logging import getLogger
-from urllib.parse import quote
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont
@@ -23,6 +23,16 @@ from config import MONGO_DB_URI
 
 
 LOGGER = getLogger(__name__)
+
+
+# =======================================================
+# OPTIONAL LOG GROUP
+# =======================================================
+
+try:
+    from config import LOG_GROUP_ID
+except ImportError:
+    LOG_GROUP_ID = None
 
 
 # =======================================================
@@ -196,7 +206,7 @@ def welcomepic(
     username_text = (
         f"@{uname}"
         if uname
-        else "ɴᴏᴛ sᴇᴛ"
+        else "𝐍σт 𝐒єт"
     )
 
     draw.text(
@@ -236,8 +246,7 @@ async def welcome_cmd(_, message: Message):
     if not message.from_user:
         return
 
-    chat = message.chat
-    chat_id = chat.id
+    chat_id = message.chat.id
 
     # ---------------------------------------------------
     # ADMIN CHECK
@@ -257,7 +266,7 @@ async def welcome_cmd(_, message: Message):
         )
 
         return await message.reply_text(
-            "⚠️ ᴜsᴇʀ ɪɴғᴏʀᴍᴀᴛɪᴏɴ ɴᴏᴛ ғᴏᴜɴᴅ."
+            "⚠️ 𝐔ѕєя 𝐈ηƒσямαтιση 𝐍σт 𝐅συη∂."
         )
 
     if member.status not in (
@@ -266,8 +275,8 @@ async def welcome_cmd(_, message: Message):
     ):
 
         return await message.reply_text(
-            "» ᴏɴʟʏ ᴀᴅᴍɪɴs ᴄᴀɴ ʜᴀɴᴅʟᴇ "
-            "ᴡᴇʟᴄᴏᴍᴇ sʏsᴛᴇᴍ"
+            "» 𝐎ηℓу 𝐀∂мιηѕ 𝐂αη 𝐇αη∂ℓє "
+            "𝐖єℓ¢σмє 𝐒уѕтєм."
         )
 
     # ---------------------------------------------------
@@ -279,34 +288,30 @@ async def welcome_cmd(_, message: Message):
     )
 
     status = (
-        "ᴇɴᴀʙʟᴇᴅ"
+        "𝐄ηαвℓє∂"
         if state
-        else "ᴅɪsᴀʙʟᴇᴅ"
+        else "𝐃ιѕαвℓє∂"
     )
 
     buttons = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
-                    "✅ ᴇɴᴀʙʟᴇ",
-                    callback_data=(
-                        f"wlc_on_{chat_id}"
-                    ),
+                    "✅ 𝐄ηαвℓє",
+                    callback_data=f"wlc_on_{chat_id}",
                 ),
                 InlineKeyboardButton(
-                    "❌ ᴅɪsᴀʙʟᴇ",
-                    callback_data=(
-                        f"wlc_off_{chat_id}"
-                    ),
+                    "❌ 𝐃ιѕαвℓє",
+                    callback_data=f"wlc_off_{chat_id}",
                 ),
             ]
         ]
     )
 
     await message.reply_text(
-        f"» ᴄᴜʀʀᴇɴᴛʟʏ ᴡᴇʟᴄᴏᴍᴇ sᴛᴀᴛᴜs : "
+        f"» 𝐂υяяєηтℓу 𝐖єℓ¢σмє 𝐒тαтυѕ : "
         f"**{status}**\n\n"
-        f"» ɢʀᴏᴜᴘ : **{chat.title}**",
+        f"» 𝐆яσυρ : **{message.chat.title}**",
         reply_markup=buttons,
     )
 
@@ -316,9 +321,7 @@ async def welcome_cmd(_, message: Message):
 # =======================================================
 
 @app.on_callback_query(
-    filters.regex(
-        r"^wlc_(on|off)_"
-    )
+    filters.regex(r"^wlc_(on|off)_")
 )
 async def welcome_toggle(_, query):
 
@@ -332,7 +335,7 @@ async def welcome_toggle(_, query):
     except Exception:
 
         return await query.answer(
-            "ɪɴᴠᴀʟɪᴅ ʀᴇǫᴜᴇsᴛ!",
+            "𝐈ηναℓι∂ 𝐑єqυєѕт!",
             show_alert=True,
         )
 
@@ -350,7 +353,7 @@ async def welcome_toggle(_, query):
     except Exception:
 
         return await query.answer(
-            "ᴜɴᴀʙʟᴇ ᴛᴏ ᴄʜᴇᴄᴋ ᴀᴅᴍɪɴ sᴛᴀᴛᴜs!",
+            "𝐔ηαвℓє тσ 𝐂нє¢к 𝐀∂мιη 𝐒тαтυѕ!",
             show_alert=True,
         )
 
@@ -360,7 +363,7 @@ async def welcome_toggle(_, query):
     ):
 
         return await query.answer(
-            "ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ 🥺",
+            "𝐘συ 𝐀яє ησт αη 𝐀∂мιη!",
             show_alert=True,
         )
 
@@ -374,7 +377,7 @@ async def welcome_toggle(_, query):
             chat_id
         )
 
-        new_status = "ᴇɴᴀʙʟᴇᴅ"
+        new_status = "𝐄ηαвℓє∂"
 
     else:
 
@@ -382,7 +385,7 @@ async def welcome_toggle(_, query):
             chat_id
         )
 
-        new_status = "ᴅɪsᴀʙʟᴇᴅ"
+        new_status = "𝐃ιѕαвℓє∂"
 
     try:
 
@@ -390,56 +393,36 @@ async def welcome_toggle(_, query):
             chat_id
         )
 
-        title = (
-            chat.title
-            or "ɢʀᴏᴜᴘ"
-        )
+        title = chat.title or "𝐆яσυρ"
 
     except Exception:
 
-        title = "ɢʀᴏᴜᴘ"
+        title = "𝐆яσυρ"
 
     await query.message.edit_text(
-        f"» ᴡᴇʟᴄᴏᴍᴇ ᴍᴇssᴀɢᴇ "
+        f"» 𝐖єℓ¢σмє 𝐌єѕѕαgє "
         f"**{new_status}**\n\n"
-        f"» ɢʀᴏᴜᴘ : **{title}**\n"
-        f"» ʙʏ : {query.from_user.mention}"
+        f"» 𝐆яσυρ : **{title}**\n"
+        f"» 𝐁у : {query.from_user.mention}"
     )
 
     await query.answer(
-        f"ᴡᴇʟᴄᴏᴍᴇ {new_status}!"
+        f"𝐖єℓ¢σмє {new_status}!"
     )
 
 
 # =======================================================
-# NEW MEMBER WELCOME
+# JOIN / LEFT + WELCOME SYSTEM
 # =======================================================
 
 @app.on_chat_member_updated(
     filters.group,
     group=-3,
 )
-async def greet_new_member(
+async def member_update(
     _,
     member: ChatMemberUpdated,
 ):
-
-    chat_id = member.chat.id
-
-    # ---------------------------------------------------
-    # CHECK WELCOME ENABLED
-    # ---------------------------------------------------
-
-    is_enabled = await get_welcome(
-        chat_id
-    )
-
-    if not is_enabled:
-        return
-
-    # ---------------------------------------------------
-    # CHECK NEW MEMBER
-    # ---------------------------------------------------
 
     if not member.new_chat_member:
         return
@@ -449,9 +432,9 @@ async def greet_new_member(
     if not user:
         return
 
-    # ---------------------------------------------------
-    # STATUS CHECK
-    # ---------------------------------------------------
+    # ===================================================
+    # STATUS
+    # ===================================================
 
     old_status = (
         member.old_chat_member.status
@@ -461,28 +444,114 @@ async def greet_new_member(
 
     new_status = member.new_chat_member.status
 
-    old_statuses = (
-        None,
-        enums.ChatMemberStatus.LEFT,
-        enums.ChatMemberStatus.BANNED,
-    )
-
-    new_statuses = (
+    join_statuses = (
         enums.ChatMemberStatus.MEMBER,
         enums.ChatMemberStatus.RESTRICTED,
         enums.ChatMemberStatus.ADMINISTRATOR,
         enums.ChatMemberStatus.OWNER,
     )
 
-    if old_status not in old_statuses:
+    left_statuses = (
+        enums.ChatMemberStatus.LEFT,
+        enums.ChatMemberStatus.BANNED,
+    )
+
+    is_join = (
+        old_status in (
+            None,
+            enums.ChatMemberStatus.LEFT,
+            enums.ChatMemberStatus.BANNED,
+        )
+        and new_status in join_statuses
+    )
+
+    is_left = (
+        new_status in left_statuses
+    )
+
+    if not is_join and not is_left:
         return
 
-    if new_status not in new_statuses:
-        return
+    # ===================================================
+    # GROUP DATA
+    # ===================================================
 
-    # ---------------------------------------------------
-    # DOWNLOAD PROFILE PHOTO
-    # ---------------------------------------------------
+    chat = member.chat
+
+    group_name = (
+        chat.title
+        or "𝐍σт 𝐀ναιℓαвℓє"
+    )
+
+    group_username = (
+        f"@{chat.username}"
+        if chat.username
+        else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ"
+    )
+
+    group_link = (
+        f"https://t.me/{chat.username}"
+        if chat.username
+        else None
+    )
+
+    try:
+
+        full_chat = await app.get_chat(
+            chat.id
+        )
+
+        members_count = (
+            full_chat.members_count
+            if full_chat.members_count is not None
+            else "𝐍/𝐀"
+        )
+
+    except Exception:
+
+        members_count = "𝐍/𝐀"
+
+    # ===================================================
+    # USER DATA
+    # ===================================================
+
+    if user.last_name:
+
+        user_name = (
+            f"{user.first_name} "
+            f"{user.last_name}"
+        )
+
+    else:
+
+        user_name = (
+            user.first_name
+            or "𝐍σт 𝐍αмє"
+        )
+
+    username = (
+        f"@{user.username}"
+        if user.username
+        else "𝐍σ 𝐔ѕєяηαмє"
+    )
+
+    public_profile = (
+        f"https://t.me/{user.username}"
+        if user.username
+        else None
+    )
+
+    private_profile = (
+        f"tg://user?id={user.id}"
+    )
+
+    join_time = datetime.now().strftime(
+        "%d-%m-%Y • %I:%M %p"
+    )
+
+    # ===================================================
+    # PROFILE PHOTO
+    # ===================================================
 
     pic = "ShiviMusic/assets/upic.png"
 
@@ -495,7 +564,7 @@ async def greet_new_member(
 
             downloaded = await app.download_media(
                 user.photo.big_file_id,
-                file_name=f"downloads/pp{user.id}.png",
+                file_name=f"downloads/pp_{user.id}.png",
             )
 
             if downloaded:
@@ -507,12 +576,92 @@ async def greet_new_member(
             f"Profile photo error: {e}"
         )
 
-    # ---------------------------------------------------
+    # ===================================================
+    # JOIN LOGGER
+    # ===================================================
+
+    if is_join:
+
+        log_caption = f"""
+👤 𝐍єω 𝐌ємвєя 𝐉σιηє∂
+
+👤 𝐍αмє: {user_name}
+🔖 𝐔ѕєяηαмє: {username}
+🆔 𝐔ѕєя 𝐈𝐃: {user.id}
+⏰ 𝐉σιη 𝐓ιмє: {join_time}
+👥 𝐆яσυρ: {group_name}
+
+🌐 𝐏υвℓι¢ 𝐏яσƒιℓє: {"𝐎ρєη 𝐏яσƒιℓє" if public_profile else "𝐍σ 𝐏υвℓι¢ 𝐔ѕєяηαмє"}
+👤 𝐏яινтє 𝐏яσƒιℓє: 𝐎ρєη 𝐏яινтє 𝐏яσƒιℓє
+👥 𝐆яσυρ 𝐋ιηк: {"𝐎ρєη 𝐆яσυρ" if group_link else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ 𝐋ιηк"}
+"""
+
+    # ===================================================
+    # LEFT LOGGER
+    # ===================================================
+
+    else:
+
+        log_caption = f"""
+👤 𝐌ємвєя 𝐋єƒт
+
+👤 𝐍αмє: {user_name}
+🔖 𝐔ѕєяηαмє: {username}
+🆔 𝐔ѕєя 𝐈𝐃: {user.id}
+⏰ 𝐋єƒт 𝐓ιмє: {join_time}
+👥 𝐆яσυρ: {group_name}
+
+🌐 𝐏υвℓι¢ 𝐏яσƒιℓє: {"𝐎ρєη 𝐏яσƒιℓє" if public_profile else "𝐍σ 𝐏υвℓι¢ 𝐔ѕєяηαмє"}
+👤 𝐏яινтє 𝐏яσƒιℓє: 𝐎ρєη 𝐏яινтє 𝐏яσƒιℓє
+👥 𝐆яσυρ 𝐋ιηк: {"𝐎ρєη 𝐆яσυρ" if group_link else "𝐍σ 𝐏υвℓι¢ 𝐆яσυρ 𝐋ιηк"}
+"""
+
+    # ===================================================
+    # CONSOLE LOGGER
+    # ===================================================
+
+    LOGGER.info(log_caption)
+
+    # ===================================================
+    # TELEGRAM LOG GROUP
+    # ===================================================
+
+    if LOG_GROUP_ID:
+
+        try:
+
+            await app.send_photo(
+                chat_id=LOG_GROUP_ID,
+                photo="ShiviMusic/assets/wel2.png",
+                caption=log_caption,
+            )
+
+        except Exception as e:
+
+            LOGGER.warning(
+                f"Log group error: {e}"
+            )
+
+    # ===================================================
+    # LEFT MEMBER
+    # ===================================================
+
+    if is_left:
+        return
+
+    # ===================================================
+    # CHECK WELCOME ENABLED
+    # ===================================================
+
+    if not await get_welcome(chat.id):
+        return
+
+    # ===================================================
     # DELETE PREVIOUS WELCOME
-    # ---------------------------------------------------
+    # ===================================================
 
     old = temp.MELCOW.get(
-        f"welcome-{chat_id}"
+        f"welcome-{chat.id}"
     )
 
     if old:
@@ -523,49 +672,16 @@ async def greet_new_member(
         except Exception:
             pass
 
-    # ---------------------------------------------------
-    # GROUP INFORMATION
-    # ---------------------------------------------------
-
-    try:
-
-        chat = await app.get_chat(
-            chat_id
-        )
-
-        chat_title = (
-            chat.title
-            or "ɢʀᴏᴜᴘ"
-        )
-
-        members_count = (
-            chat.members_count
-            if chat.members_count is not None
-            else "ɴ/ᴀ"
-        )
-
-    except Exception as e:
-
-        LOGGER.warning(
-            f"Group information error: {e}"
-        )
-
-        chat_title = "ɢʀᴏᴜᴘ"
-        members_count = "ɴ/ᴀ"
-
-    # ---------------------------------------------------
+    # ===================================================
     # CREATE WELCOME IMAGE
-    # ---------------------------------------------------
+    # ===================================================
 
     try:
 
         welcomeimg = welcomepic(
             pic=pic,
-            user=(
-                user.first_name
-                or "ᴜsᴇʀ"
-            ),
-            chatname=chat_title,
+            user=user_name,
+            chatname=group_name,
             user_id=user.id,
             uname=user.username,
         )
@@ -578,59 +694,47 @@ async def greet_new_member(
 
         welcomeimg = pic
 
-    # ---------------------------------------------------
-    # USERNAME
-    # ---------------------------------------------------
+    # ===================================================
+    # WELCOME USERNAME
+    # ===================================================
 
-    username = (
+    welcome_username = (
         f"@{user.username}"
         if user.username
-        else "ɴᴏᴛ sᴇᴛ"
+        else "𝐍σт 𝐒єт"
     )
-
-    # ---------------------------------------------------
-    # NAME
-    # ---------------------------------------------------
 
     name = (
         user.mention
         if user.first_name
-        else "ᴜsᴇʀ"
+        else "𝐔ѕєя"
     )
 
     # ===================================================
-    # FINAL WELCOME CAPTION
+    # WELCOME CAPTION
     # ===================================================
 
     caption = f"""
 <blockquote>
-🌿💗 ‼️ ʀᴀᴅʜᴇ ᴋʀɪsʜɴᴀ ‼️ 💗🌿
+🌿💗 ‼️ 𝐑α∂нє 𝐊яιѕнηα ‼️ 💗🌿
 </blockquote>
 
-🎊 ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ɢʀᴏᴜᴘ! 🎊
+🎊 𝐖єℓ¢σмє тσ тнє 𝐆яσυρ! 🎊
 
 <blockquote expandable>
-✦ ɴᴀᴍᴇ      → {name}
-✦ ᴜsᴇʀɴᴀᴍᴇ  → {username}
-✦ ᴜsᴇʀ ɪᴅ   → <code>{user.id}</code>
-✦ ᴍᴇᴍʙᴇʀs   → <code>{members_count}</code>
+✦ 𝐍αмє      → {name}
+✦ 𝐔ѕєяηαмє  → {welcome_username}
+✦ 𝐔ѕєя 𝐈𝐃   → <code>{user.id}</code>
+✦ 𝐌ємвєяѕ   → <code>{members_count}</code>
 </blockquote>
 
 <blockquote>
-🌸 sᴛᴀʏ ʜᴀᴘᴘʏ &amp; ᴇɴᴊᴏʏ ʏᴏᴜʀ ᴛɪᴍᴇ ʜᴇʀᴇ! 🌸
+🌸 𝐒тαу 𝐇αρρу &amp; 𝐄ηנσу 𝐘συя 𝐓ιмє 𝐇єяє! 🌸
 </blockquote>
 """
 
     # ===================================================
-    # VIEW PROFILE URL
-    # ===================================================
-    #
-    # Username available:
-    #     https://t.me/username
-    #
-    # No username:
-    #     tg://user?id=USER_ID
-    #
+    # VIEW PROFILE
     # ===================================================
 
     if user.username:
@@ -664,7 +768,7 @@ async def greet_new_member(
         bot_username = None
 
     # ===================================================
-    # ADD ME URL
+    # ADD ME
     # ===================================================
 
     if bot_username:
@@ -680,19 +784,19 @@ async def greet_new_member(
 
     # ===================================================
     # BUTTONS
-    # =======================================================
+    # ===================================================
 
     buttons = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
-                    "👤 ᴠɪᴇᴡ ᴘʀᴏғɪʟᴇ",
+                    "👤 𝐕ιєω 𝐏яσƒιℓє",
                     url=profile_url,
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "➕ ᴀᴅᴅ ᴍᴇ",
+                    "➕ 𝐀∂∂ 𝐌є",
                     url=add_me_url,
                 )
             ],
@@ -706,7 +810,7 @@ async def greet_new_member(
     try:
 
         msg = await app.send_photo(
-            chat_id=chat_id,
+            chat_id=chat.id,
             photo=welcomeimg,
             caption=caption,
             parse_mode=enums.ParseMode.HTML,
@@ -722,12 +826,12 @@ async def greet_new_member(
         return
 
     # ===================================================
-    # AUTO DELETE AFTER 200 SECONDS
+    # AUTO DELETE AFTER 20 SECONDS
     # ===================================================
 
     async def delete_welcome():
 
-        await asyncio.sleep(200)
+        await asyncio.sleep(20)
 
         try:
 
@@ -737,13 +841,13 @@ async def greet_new_member(
             pass
 
         temp.MELCOW.pop(
-            f"welcome-{chat_id}",
+            f"welcome-{chat.id}",
             None,
         )
 
-        # ------------------------------------------------
-        # Delete generated image
-        # ------------------------------------------------
+        # -----------------------------------------------
+        # DELETE GENERATED IMAGE
+        # -----------------------------------------------
 
         try:
 
@@ -764,15 +868,31 @@ async def greet_new_member(
         except Exception:
             pass
 
+        # -----------------------------------------------
+        # DELETE PROFILE PHOTO
+        # -----------------------------------------------
+
+        try:
+
+            if (
+                pic.startswith("downloads/")
+                and os.path.exists(pic)
+            ):
+
+                os.remove(pic)
+
+        except Exception:
+            pass
+
     asyncio.create_task(
         delete_welcome()
     )
 
     temp.MELCOW[
-        f"welcome-{chat_id}"
+        f"welcome-{chat.id}"
     ] = msg
 
 
 # =======================================================
 # ©️ 2025-26 All Rights Reserved by Purvi Bots
-# =======================================================
+# =================================================
