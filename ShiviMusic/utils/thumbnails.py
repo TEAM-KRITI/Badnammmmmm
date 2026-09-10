@@ -351,7 +351,7 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
 
         trimmed = trim_text(title, title_font, MAX_TITLE_WIDTH)
         draw.text((TITLE_X + 1, TITLE_Y + 1), trimmed, fill=(0, 0, 0, 100), font=title_font)
-        draw.text((TITLE_X, TITLE_Y), trimmed, fill="white", font=title_font)
+        draw.text((TITLE_X, TITLE_Y), trimmed, fill="yellow", font=title_font)
 
         draw.text((TITLE_X, META_Y), f"Channel | {channel}",
                   fill=(190, 190, 190), font=axiom_font)
@@ -359,7 +359,7 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
         draw.text((TITLE_X, VIEWS_Y), f"Views | {views}",
                   fill=(190, 190, 190), font=axiom_font)
 
-        draw.text((TITLE_X, PLAYER_Y), f"Player | @Kirtiprobot",
+        draw.text((TITLE_X, PLAYER_Y), f"Player | @annu_updates",
                   fill=(190, 190, 190), font=axiom_font)
 
         draw.text((TITLE_X, DEV_Y), "",
@@ -373,7 +373,7 @@ async def get_thumb(videoid: str, progress_percent: int = 0, use_cache: bool = T
             clean_name = re.sub(r'<[^>]+>', '', str(user_name)).strip()
         
         if not clean_name:
-            clean_name = "BADNAM"
+            clean_name = "Kirti_bots"
         
         prefix_text = "Requested By | "
         draw.text((TITLE_X, DEV_Y), prefix_text, 
