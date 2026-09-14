@@ -7,8 +7,6 @@
 from html import escape
 
 from pyrogram import filters, enums
-from ShiviMusic import app
-
 from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -17,6 +15,8 @@ from pyrogram.types import (
 )
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from ShiviMusic import app
 
 from ShiviMusic.utils.nightmodedb import (
     nightdb,
@@ -91,7 +91,9 @@ NIGHT_MSG_BUTTONS = InlineKeyboardMarkup(
 # NIGHTMODE COMMAND
 # =======================================================
 
-@app.on_message(filters.command("nightmode") & filters.group)
+@app.on_message(
+    filters.command("nightmode") & filters.group
+)
 async def _nightmode(_, message):
 
     await message.reply_photo(
@@ -100,7 +102,11 @@ async def _nightmode(_, message):
         caption=(
             "<b>⚙️ ɴɪɢнᴛмσᴅᴇ ѕᴇᴛᴛɪηɢѕ</b>\n\n"
             "<b>ᴄʟɪᴄκ ᴛнᴇ ʙυᴛᴛσηѕ ʙᴇʟσω ᴛσ ᴄσηᴛʀσʟ "
-            "ɴɪɢнᴛмσᴅᴇ ѕᴇᴛᴛɪηɢѕ ғσʀ ᴛнɪѕ ɢʀσυᴘ.</b>"
+            "ɴɪɢнᴛмσᴅᴇ ѕᴇᴛᴛɪηɢѕ ғσʀ ᴛнɪѕ ɢʀσυᴘ.</b>\n\n"
+            "<b>🌙 ɴɪɢнᴛмσᴅᴇ ᴛɪмᴇ:</b>\n"
+            "<b>🌆 06:00 PM → 🌅 06:00 AM [IST]</b>\n\n"
+            "<b>👑 σηʟʏ ɢʀσυᴘ σωηᴇʀ ᴄᴧη ѕᴇηᴅ "
+            "мᴇѕѕᴧɢᴇѕ ᴅυʀɪηɢ ηɪɢнᴛмσᴅᴇ.</b>"
         ),
 
         parse_mode=enums.ParseMode.HTML,
@@ -128,6 +134,7 @@ async def nightcb(_, query: CallbackQuery):
     administrators = []
 
     try:
+
         async for member in app.get_chat_members(
             chat_id,
             filter=enums.ChatMembersFilter.ADMINISTRATORS
@@ -135,6 +142,7 @@ async def nightcb(_, query: CallbackQuery):
             administrators.append(member.user.id)
 
     except Exception as e:
+
         print(f"Admin check error: {e}")
 
         return await query.answer(
@@ -142,9 +150,11 @@ async def nightcb(_, query: CallbackQuery):
             show_alert=True
         )
 
+    # Only admins can use buttons
     if user_id not in administrators:
+
         return await query.answer(
-            "❌ σηʟʏ ᴧᴅмɪηѕ ᴄᴧη υѕᴇ ᴛнɪѕ ᴄσммᴧηᴅ!",
+            "❌ σηʟʏ ᴧᴅмɪηѕ ᴄᴧη υѕᴇ ᴛнɪѕ!",
             show_alert=True
         )
 
@@ -160,7 +170,9 @@ async def nightcb(_, query: CallbackQuery):
             await query.message.edit_caption(
                 caption=(
                     "<b>🌕 ɴɪɢнᴛмσᴅᴇ ɪѕ ᴧʟʀᴇᴧᴅʏ "
-                    "ᴇηᴧʙʟᴇᴅ ɪη ᴛнɪѕ ɢʀσυᴘ.</b>"
+                    "ᴇηᴧʙʟᴇᴅ ɪη ᴛнɪѕ ɢʀσυᴘ.</b>\n\n"
+                    "<b>⏰ 06:00 PM → 06:00 AM [IST]</b>\n"
+                    "<b>👑 σηʟʏ σωηᴇʀ ᴄᴧη ѕᴇηᴅ.</b>"
                 ),
                 parse_mode=enums.ParseMode.HTML,
                 reply_markup=buttons
@@ -173,9 +185,11 @@ async def nightcb(_, query: CallbackQuery):
             await query.message.edit_caption(
                 caption=(
                     "<b>✅ ɴɪɢнᴛмσᴅᴇ ᴧᴄᴛɪνᴧᴛᴇᴅ!</b>\n\n"
-                    "<b>ᴛнɪѕ ɢʀσυᴘ ᴡɪʟʟ ʟσᴄκ ᴧᴛ "
-                    "𝟏𝟐:𝟎𝟎 ᴧм ᴧηᴅ ᴜηʟσᴄκ ᴧᴛ "
-                    "𝟎𝟔:𝟎𝟎 ᴧм [ɪѕᴛ].</b>"
+                    "<b>🌙 ɴɪɢнᴛмσᴅᴇ: "
+                    "06:00 PM → 06:00 AM [IST]</b>\n\n"
+                    "<b>👑 σηʟʏ ɢʀσυᴘ σωηᴇʀ ᴄᴧη "
+                    "ѕᴇηᴅ мᴇѕѕᴧɢᴇѕ.</b>\n"
+                    "<b>🔴 Admins & members' messages will be deleted.</b>"
                 ),
                 parse_mode=enums.ParseMode.HTML,
                 reply_markup=buttons
@@ -194,7 +208,8 @@ async def nightcb(_, query: CallbackQuery):
 
             await query.message.edit_caption(
                 caption=(
-                    "<b>❌ ɴɪɢнᴛмσᴅᴇ ᴅᴇᴧᴄᴛɪνᴧᴛᴇᴅ!</b>"
+                    "<b>❌ ɴɪɢнᴛмσᴅᴇ ᴅᴇᴧᴄᴛɪνᴧᴛᴇᴅ!</b>\n\n"
+                    "<b>🌅 ɢʀσυᴘ ɪѕ ησω σηᴇη ғσʀ ᴇνᴇʀʏσηᴇ.</b>"
                 ),
                 parse_mode=enums.ParseMode.HTML,
                 reply_markup=buttons
@@ -215,7 +230,61 @@ async def nightcb(_, query: CallbackQuery):
 
 
 # =======================================================
-# GOOD NIGHT
+# OWNER ONLY MESSAGE SYSTEM
+# =======================================================
+
+@app.on_message(
+    filters.group
+    & ~filters.service
+)
+async def nightmode_owner_only(_, message):
+
+    chat_id = message.chat.id
+
+    # Check Night Mode database
+    night_enabled = await nightdb.find_one(
+        {"chat_id": chat_id}
+    )
+
+    if not night_enabled:
+        return
+
+    # Ignore messages without user
+    if not message.from_user:
+        return
+
+    user_id = message.from_user.id
+
+    try:
+
+        member = await app.get_chat_member(
+            chat_id,
+            user_id
+        )
+
+        # =================================================
+        # ONLY OWNER CAN SEND
+        # =================================================
+
+        if member.status == enums.ChatMemberStatus.OWNER:
+            return
+
+        # =================================================
+        # DELETE EVERYONE ELSE
+        # =================================================
+
+        await message.delete()
+
+    except Exception as e:
+
+        print(
+            f"NightMode message delete error "
+            f"[{chat_id}]: {e}"
+        )
+
+
+# =======================================================
+# GOOD NIGHT — 06:00 PM
 # =======================================================
 
 async def start_nightmode():
@@ -234,12 +303,21 @@ async def start_nightmode():
                 group.title or "υηκɴσωη ɢʀσυᴘ"
             )
 
+            # Lock group first
+            await app.set_chat_permissions(
+                chat_id,
+                CLOSE_CHAT
+            )
+
             caption = (
                 "<u><b>🌙 ɴɪɢнᴛмσᴅᴇ ѕᴛᴧʀᴛᴇᴅ — "
                 "ɢʀσυᴘ ᴄʟσѕᴇᴅ.</b></u>\n\n"
 
-                "<b>◉ ɴση-ᴧᴅмɪηѕ ᴄᴧη'ᴛ ѕᴇηᴅ "
+                "<b>◉ ηση-σωηᴇʀѕ ᴄᴧη'ᴛ ѕᴇηᴅ "
                 "мᴇѕѕᴧɢᴇѕ ησω.</b>\n"
+
+                "<b>◉ 👑 σηʟʏ ɢʀσυᴘ σωηᴇʀ "
+                "ᴄᴧη ѕᴇηᴅ.</b>\n"
 
                 "<b>◉ ɢσσᴅ ηɪɢнᴛ ᴇνᴇʀʏσηᴇ 🌙</b>\n\n"
 
@@ -259,11 +337,6 @@ async def start_nightmode():
                 reply_markup=NIGHT_MSG_BUTTONS
             )
 
-            await app.set_chat_permissions(
-                chat_id,
-                CLOSE_CHAT
-            )
-
         except Exception as e:
 
             print(
@@ -272,7 +345,7 @@ async def start_nightmode():
 
 
 # =======================================================
-# GOOD MORNING
+# GOOD MORNING — 06:00 AM
 # =======================================================
 
 async def close_nightmode():
@@ -291,11 +364,17 @@ async def close_nightmode():
                 group.title or "υηκɴσωη ɢʀσυᴘ"
             )
 
+            # Open group first
+            await app.set_chat_permissions(
+                chat_id,
+                OPEN_CHAT
+            )
+
             caption = (
                 "<u><b>🌅 ɴɪɢнᴛмσᴅᴇ ᴇηᴅᴇᴅ — "
                 "ɢʀσυᴘ σᴘᴇη.</b></u>\n\n"
 
-                "<b>◉ ɴση-ᴧᴅмɪηѕ ᴄᴧη ησω ѕᴇηᴅ "
+                "<b>◉ ᴇνᴇʀʏσηᴇ ᴄᴧη ησω ѕᴇηᴅ "
                 "мᴇѕѕᴧɢᴇѕ.</b>\n"
 
                 "<b>◉ ɢσσᴅ мσʀηɪηɢ ᴇνᴇʀʏσηᴇ ☀️</b>\n\n"
@@ -316,11 +395,6 @@ async def close_nightmode():
                 reply_markup=NIGHT_MSG_BUTTONS
             )
 
-            await app.set_chat_permissions(
-                chat_id,
-                OPEN_CHAT
-            )
-
         except Exception as e:
 
             print(
@@ -338,28 +412,28 @@ scheduler = AsyncIOScheduler(
 
 
 # =======================================================
-# 11:59 PM — NIGHT MODE START
+# 🌙 06:00 PM — NIGHT MODE START
 # =======================================================
 
 scheduler.add_job(
     start_nightmode,
     trigger="cron",
-    hour=23,
-    minute=59,
+    hour=18,
+    minute=0,
     id="nightmode_start",
     replace_existing=True
 )
 
 
 # =======================================================
-# 06:01 AM — NIGHT MODE END
+# 🌅 06:00 AM — NIGHT MODE END
 # =======================================================
 
 scheduler.add_job(
     close_nightmode,
     trigger="cron",
     hour=6,
-    minute=1,
+    minute=0,
     id="nightmode_end",
     replace_existing=True
 )
