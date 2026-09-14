@@ -1,11 +1,5 @@
 # =======================================================
-# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 🚀
-#
-# This source code is under MIT License 📜
-# Unauthorized forking, importing, or using this code without
-# giving proper credit will result in legal action ⚠️
-#
-# 📩 DM for permission : @TheSigmaCoder
+# ©️ 2025-26 All Rights Reserved by Purvi Bots
 # =======================================================
 
 import time
@@ -69,7 +63,11 @@ shivi_PIC = [
 # 📩 PRIVATE /START
 # =======================================================
 
-@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
+@app.on_message(
+    filters.command(["start"])
+    & filters.private
+    & ~BANNED_USERS
+)
 @LanguageStart
 async def start_pm(client, message: Message, _):
 
@@ -98,7 +96,9 @@ async def start_pm(client, message: Message, _):
 
             return await message.reply_photo(
                 random.choice(shivi_PIC),
-                caption=_["help_1"].format(config.SUPPORT_CHAT),
+                caption=_["help_1"].format(
+                    config.SUPPORT_CHAT
+                ),
                 reply_markup=keyboard,
             )
 
@@ -139,25 +139,32 @@ async def start_pm(client, message: Message, _):
 
             m = await message.reply_text("🔎")
 
-            query = (str(name)).replace(
+            query = name.replace(
                 "info_",
                 "",
                 1,
             )
 
-            query = f"https://www.youtube.com/watch?v={query}"
+            query = (
+                f"https://www.youtube.com/watch?v={query}"
+            )
 
             results = VideosSearch(
                 query,
                 limit=1,
             )
 
-            for result in (await results.next())["result"]:
+            data = await results.next()
+
+            for result in data["result"]:
 
                 title = result["title"]
                 duration = result["duration"]
                 views = result["viewCount"]["short"]
-                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
+                thumbnail = (
+                    result["thumbnails"][0]["url"]
+                    .split("?")[0]
+                )
                 channellink = result["channel"]["link"]
                 channel = result["channel"]["name"]
                 link = result["link"]
@@ -263,35 +270,56 @@ async def join_request_welcome(
 
     try:
 
-        language = await get_lang(request.chat.id)
+        language = await get_lang(
+            request.chat.id
+        )
+
         _ = get_string(language)
 
         # Telegram temporary user chat ID
         user_chat_id = (
-            getattr(request, "user_chat_id", None)
+            getattr(
+                request,
+                "user_chat_id",
+                None,
+            )
             or user.id
         )
 
         group_title = (
             request.chat.title
-            or "this group"
+            or "ᴛʜɪs ɢʀᴏᴜᴘ"
         )
 
         # =================================================
-        # ✨ STYLISH WELCOME MESSAGE
+        # ✨ PREMIUM WELCOME MESSAGE
         # =================================================
 
         caption = (
-            f"<b>𝐖ᴇʟᴄᴏᴍᴇ, {user.mention} 🇮🇳</b>\n\n"
-            f"𝐘ᴏᴜʀ 𝐑ᴇǫᴜᴇsᴛ 𝐓ᴏ 𝐉ᴏɪɴ "
+            f"<b>🌸 ᴡᴇʟᴄᴏᴍᴇ, {user.mention} 🇮🇳</b>\n\n"
+
+            f"✨ ʏᴏᴜʀ ʀᴇǫᴜᴇsᴛ ᴛᴏ ᴊᴏɪɴ "
             f"<b>{group_title}</b> "
-            f"𝐇ᴀs 𝐁ᴇᴇɴ 𝐑ᴇᴄɪᴠᴇᴅ. ✅\n\n"
-            f"𝐖ʜɪʟᴇ 𝐘ᴏᴜ 𝐖ᴀɪᴛ, 𝐄xᴘʟᴏʀᴇ — "
-            f"<b>{app.mention}</b> 🎶\n\n"
-            f"• 𝐇ɪɢʜ 𝐐ᴜᴀʟᴛʏ 𝐌ᴜsɪᴄ\n"
-            f"• 𝐅ᴀsᴛ & 𝐒ᴍᴏᴏᴛʜ 𝐏ʟᴀʏʙᴀᴄᴋ\n"
-            f"• 𝐒ᴛᴀʙʟᴇ 𝐄xᴘʀɪɴᴄᴇ\n\n"
-            f"𝐔ѕє /start тσ 𝐁ᴇɢᴜɴ."
+            f"ʜᴀs ʙᴇᴇɴ ʀᴇᴄᴇɪᴠᴇᴅ. ✅\n\n"
+
+            f"💎 <b>ᴛʜᴀɴᴋ ʏᴏᴜ ғᴏʀ ᴄʜᴏᴏsɪɴɢ "
+            f"{app.mention}</b>\n\n"
+
+            f"🎶 ᴇɴᴊᴏʏ ʜɪɢʜ-ǫᴜᴀʟɪᴛʏ ᴍᴜsɪᴄ ᴡɪᴛʜ "
+            f"{app.mention}. ✨\n\n"
+
+            f"🎧 • ʜɪɢʜ ǫᴜᴀʟɪᴛʏ ᴍᴜsɪᴄ\n"
+            f"⚡ • ғᴀsᴛ & sᴍᴏᴏᴛʜ ᴘʟᴀʏʙᴀᴄᴋ\n"
+            f"💫 • ᴘʀᴇᴍɪᴜᴍ ᴍᴜsɪᴄ ᴇxᴘᴇʀɪᴇɴᴄᴇ\n\n"
+
+            f"🔔 <b>ʏᴏᴜʀ ʀᴇǫᴜᴇsᴛ ɪs ᴘᴇɴᴅɪɴɢ.</b>\n"
+            f"⏳ ᴡᴀɪᴛ ғᴏʀ ᴀᴅᴍɪɴ ᴀᴘᴘʀᴏᴠᴀʟ. ❤️\n\n"
+
+            f"🤖 <b>sᴛᴀʀᴛ {app.mention}</b> "
+            f"ᴡɪᴛʜ <b>/start</b> 🎵\n\n"
+
+            f"✨ ᴇɴᴊᴏʏ ᴛʜᴇ ᴍᴜsɪᴄ • "
+            f"ᴇɴᴊᴏʏ ᴛʜᴇ ᴠɪʙᴇ ✨"
         )
 
         # =================================================
@@ -487,9 +515,5 @@ async def welcome(
 
 
 # =======================================================
-# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 😎
-#
-# 🧑‍💻 Developer : t.me/TheSigmaCoder
-# 🔗 Source link : GitHub.com/Im-Notcoder/Purvi-V3
-# 📢 Telegram channel : t.me/Purvi_Bots
+# ©️ 2025-26 All Rights Reserved by Purvi Bots
 # =======================================================
