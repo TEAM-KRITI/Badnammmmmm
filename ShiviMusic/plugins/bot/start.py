@@ -21,8 +21,6 @@ from ShiviMusic.misc import _boot_
 from ShiviMusic.plugins.sudo.sudoers import sudoers_list
 
 from ShiviMusic.utils.database import (
-    get_served_chats,
-    get_served_users,
     add_served_chat,
     add_served_user,
     blacklisted_chats,
@@ -35,7 +33,6 @@ from ShiviMusic.utils.decorators.language import LanguageStart
 from ShiviMusic.utils.formatters import get_readable_time
 from ShiviMusic.utils.inline import (
     help_pannel,
-    private_panel,
     start_panel,
 )
 
@@ -60,20 +57,22 @@ shivi_PIC = [
 
 
 # =======================================================
-# 🎧 FIRST START MESSAGE
+# 🎧 FIRST MESSAGE
 # =======================================================
 
 def get_start_msg_1(user):
+
     return (
         f"🎧 <b>𝐇ᴇʏ {user.mention} 👋</b>"
     )
 
 
 # =======================================================
-# 🎶 SECOND START MESSAGE
+# 🎶 SECOND MESSAGE
 # =======================================================
 
 def get_start_msg_2(user, bot_name):
+
     return f"""
 ✨ <b>𝐖ᴇʟᴄᴏᴍᴇ {user.mention} ❤️</b>
 
@@ -96,25 +95,31 @@ def get_start_msg_2(user, bot_name):
 
 
 # =======================================================
-# 🔘 PRIVATE START BUTTONS
+# 🔘 START BUTTONS
 # =======================================================
 
-START_BUTTONS = InlineKeyboardMarkup(
-    [
+def get_start_buttons(bot_username):
+
+    return InlineKeyboardMarkup(
         [
-            InlineKeyboardButton(
-                text="➕ 𝐀ᴅᴅ 𝐌ᴇ 𝐈ɴ 𝐘ᴏᴜʀ 𝐆ʀᴏᴜᴘ",
-                url=f"https://t.me/{app.username}?startgroup=true",
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                text="🛒𝐒ᴜᴘᴘᴏʀᴛ 𝐂ʜᴀɴɴᴇʟ ↗",
-                url="https://t.me/annu_updates",
-            )
-        ],
-    ]
-)
+            [
+                InlineKeyboardButton(
+                    text="➕ 𝐀ᴅᴅ 𝐌ᴇ 𝐈ɴ 𝐘ᴏᴜʀ 𝐆ʀᴏᴜᴘ",
+                    url=(
+                        f"https://t.me/"
+                        f"{bot_username}"
+                        f"?startgroup=true"
+                    ),
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text="🛒 𝐁ᴜʏ 𝐓ɢ 𝐀ᴄᴄᴏᴜɴᴛ ↗",
+                    url="https://t.me/YourUsername",
+                )
+            ],
+        ]
+    )
 
 
 # =======================================================
@@ -122,7 +127,7 @@ START_BUTTONS = InlineKeyboardMarkup(
 # =======================================================
 
 @app.on_message(
-    filters.command(["start"])
+    filters.command("start")
     & filters.private
     & ~BANNED_USERS
 )
@@ -159,7 +164,10 @@ async def start_pm(
 
     if len(message.text.split()) > 1:
 
-        name = message.text.split(None, 1)[1]
+        name = message.text.split(
+            None,
+            1
+        )[1]
 
         # ------------------------------------------------
         # HELP
@@ -178,7 +186,7 @@ async def start_pm(
             )
 
         # ------------------------------------------------
-        # SUDO LIST
+        # SUDO
         # ------------------------------------------------
 
         if name.startswith("sud"):
@@ -191,11 +199,12 @@ async def start_pm(
 
             if await is_on_off(2):
 
-                return await app.send_message(
+                await app.send_message(
                     chat_id=config.LOGGER_ID,
                     text=(
                         f"✦ {user.mention} "
-                        f"ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ "
+                        f"ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ "
+                        f"ᴛᴏ ᴄʜᴇᴄᴋ "
                         f"<b>sᴜᴅᴏʟɪsᴛ</b>.\n\n"
 
                         f"<b>✦ ᴜsᴇʀ ɪᴅ ➠</b> "
@@ -214,7 +223,9 @@ async def start_pm(
 
         if name.startswith("inf"):
 
-            m = await message.reply_text("🔎")
+            m = await message.reply_text(
+                "🔎"
+            )
 
             query = name.replace(
                 "info_",
@@ -236,10 +247,11 @@ async def start_pm(
                 data = await results.next()
 
                 if not data.get("result"):
-                    await m.edit_text(
-                        "❌ <b>Video information not found.</b>"
+
+                    return await m.edit_text(
+                        "❌ <b>Video information "
+                        "not found.</b>"
                     )
-                    return
 
                 result = data["result"][0]
 
@@ -252,10 +264,19 @@ async def start_pm(
                     .split("?")[0]
                 )
 
-                channellink = result["channel"]["link"]
-                channel = result["channel"]["name"]
+                channellink = (
+                    result["channel"]["link"]
+                )
+
+                channel = (
+                    result["channel"]["name"]
+                )
+
                 link = result["link"]
-                published = result["publishedTime"]
+
+                published = (
+                    result["publishedTime"]
+                )
 
                 searched_text = _["start_6"].format(
                     title,
@@ -293,17 +314,16 @@ async def start_pm(
 
                 if await is_on_off(2):
 
-                    return await app.send_message(
+                    await app.send_message(
                         chat_id=config.LOGGER_ID,
                         text=(
                             f"✦ {user.mention} "
                             f"ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ "
                             f"ᴛᴏ ᴄʜᴇᴄᴋ "
-                            f"<b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n"
-
+                            f"<b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>."
+                            f"\n\n"
                             f"✦ <b>ᴜsᴇʀ ɪᴅ ➠</b> "
                             f"<code>{user.id}</code>\n"
-
                             f"✦ <b>ᴜsᴇʀɴᴀᴍᴇ ➠</b> "
                             f"@{user.username or 'None'}"
                         ),
@@ -311,16 +331,17 @@ async def start_pm(
 
             except Exception as ex:
 
+                print(
+                    f"[START INFO ERROR] {ex}"
+                )
+
                 try:
                     await m.edit_text(
-                        "❌ <b>Unable to fetch video information.</b>"
+                        "❌ <b>Unable to fetch "
+                        "video information.</b>"
                     )
                 except Exception:
                     pass
-
-                print(
-                    f"[START INFO] {ex}"
-                )
 
             return
 
@@ -330,38 +351,63 @@ async def start_pm(
     # 🌸 NORMAL PRIVATE START
     # ===================================================
 
-    # ---------------------------------------------------
-    # BOT NAME
-    # ---------------------------------------------------
+    try:
 
-    bot_name = app.first_name
+        # -----------------------------------------------
+        # GET REAL BOT INFORMATION
+        # -----------------------------------------------
 
-    # ---------------------------------------------------
-    # MESSAGE 1
-    # ---------------------------------------------------
+        bot = await app.get_me()
 
-    await app.send_message(
-        chat_id=message.chat.id,
-        text=get_start_msg_1(user),
-    )
+        bot_name = bot.first_name
+        bot_username = bot.username
 
-    # ---------------------------------------------------
-    # MESSAGE 2
-    # ---------------------------------------------------
+        # -----------------------------------------------
+        # MESSAGE 1
+        # -----------------------------------------------
 
-    await app.send_photo(
-        chat_id=message.chat.id,
-        photo=random.choice(shivi_PIC),
-        has_spoiler=True,
-        caption=get_start_msg_2(
-            user,
-            bot_name,
-        ),
-        reply_markup=START_BUTTONS,
-    )
+        await app.send_message(
+            chat_id=message.chat.id,
+            text=get_start_msg_1(
+                user
+            ),
+        )
+
+        # -----------------------------------------------
+        # MESSAGE 2
+        # -----------------------------------------------
+
+        await app.send_photo(
+            chat_id=message.chat.id,
+            photo=random.choice(shivi_PIC),
+            has_spoiler=True,
+            caption=get_start_msg_2(
+                user,
+                bot_name,
+            ),
+            reply_markup=get_start_buttons(
+                bot_username
+            ),
+        )
+
+    except Exception as ex:
+
+        print(
+            f"[PRIVATE START ERROR] {ex}"
+        )
+
+        # Fallback message
+        await app.send_message(
+            chat_id=message.chat.id,
+            text=(
+                f"🎧 <b>𝐇ᴇʏ "
+                f"{user.mention} 👋</b>\n\n"
+                f"✨ <b>𝐖ᴇʟᴄᴏᴍᴇ!</b>"
+            ),
+        )
 
     # ===================================================
-    # 📝 LOGGER
+    # LOGGER
     # ===================================================
 
     if await is_on_off(2):
@@ -419,38 +465,50 @@ async def join_request_welcome(
         )
 
         # =================================================
-        # ✨ PREMIUM WELCOME
+        # GET BOT
+        # =================================================
+
+        bot = await app.get_me()
+
+        # =================================================
+        # MESSAGE
         # =================================================
 
         caption = (
-            f"<b>🌸 ᴡᴇʟᴄᴏᴍᴇ, {user.mention} 🇮🇳</b>\n\n"
+            f"<b>🌸 ᴡᴇʟᴄᴏᴍᴇ, "
+            f"{user.mention} 🇮🇳</b>\n\n"
 
             f"✨ ʏᴏᴜʀ ʀᴇǫᴜᴇsᴛ ᴛᴏ ᴊᴏɪɴ "
             f"<b>{group_title}</b> "
             f"ʜᴀs ʙᴇᴇɴ ʀᴇᴄᴇɪᴠᴇᴅ. ✅\n\n"
 
-            f"💎 <b>ᴛʜᴀɴᴋ ʏᴏᴜ ғᴏʀ ᴄʜᴏᴏsɪɴɢ "
-            f"{app.mention}</b>\n\n"
+            f"💎 <b>ᴛʜᴀɴᴋ ʏᴏᴜ ғᴏʀ "
+            f"ᴄʜᴏᴏsɪɴɢ "
+            f"{bot.mention}</b>\n\n"
 
-            f"🎶 ᴇɴᴊᴏʏ ʜɪɢʜ-ǫᴜᴀʟɪᴛʏ ᴍᴜsɪᴄ "
-            f"ᴡɪᴛʜ {app.mention}. ✨\n\n"
+            f"🎶 ᴇɴᴊᴏʏ ʜɪɢʜ-ǫᴜᴀʟɪᴛʏ "
+            f"ᴍᴜsɪᴄ ᴡɪᴛʜ "
+            f"{bot.mention}. ✨\n\n"
 
             f"🎧 • ʜɪɢʜ ǫᴜᴀʟɪᴛʏ ᴍᴜsɪᴄ\n"
-            f"⚡ • ғᴀsᴛ & sᴍᴏᴏᴛʜ ᴘʟᴀʏʙᴀᴄᴋ\n"
-            f"💫 • ᴘʀᴇᴍɪᴜᴍ ᴍᴜsɪᴄ ᴇxᴘᴇʀɪᴇɴᴄᴇ\n\n"
+            f"⚡ • ғᴀsᴛ & sᴍᴏᴏᴛʜ "
+            f"ᴘʟᴀʏʙᴀᴄᴋ\n"
+            f"💫 • ᴘʀᴇᴍɪᴜᴍ "
+            f"ᴍᴜsɪᴄ ᴇxᴘᴇʀɪᴇɴᴄᴇ\n\n"
 
-            f"🔔 <b>ʏᴏᴜʀ ʀᴇǫᴜᴇsᴛ ɪs ᴘᴇɴᴅɪɴɢ.</b>\n"
-            f"⏳ ᴡᴀɪᴛ ғᴏʀ ᴀᴅᴍɪɴ ᴀᴘᴘʀᴏᴠᴀʟ. ❤️\n\n"
+            f"🔔 <b>ʏᴏᴜʀ ʀᴇǫᴜᴇsᴛ ɪs "
+            f"ᴘᴇɴᴅɪɴɢ.</b>\n"
 
-            f"🤖 <b>sᴛᴀʀᴛ {app.mention}</b> "
-            f"ᴡɪᴛʜ <b>/start</b> 🎵\n\n"
+            f"⏳ ᴡᴀɪᴛ ғᴏʀ ᴀᴅᴍɪɴ "
+            f"ᴀᴘᴘʀᴏᴠᴀʟ. ❤️\n\n"
 
-            f"✨ ᴇɴᴊᴏʏ ᴛʜᴇ ᴍᴜsɪᴄ • "
-            f"ᴇɴᴊᴏʏ ᴛʜᴇ ᴠɪʙᴇ ✨"
+            f"🤖 <b>sᴛᴀʀᴛ "
+            f"{bot.mention}</b> "
+            f"ᴡɪᴛʜ <b>/start</b> 🎵"
         )
 
         # =================================================
-        # 🔘 BUTTONS
+        # BUTTONS
         # =================================================
 
         keyboard = InlineKeyboardMarkup(
@@ -475,7 +533,7 @@ async def join_request_welcome(
         )
 
         # =================================================
-        # 📤 SEND WELCOME
+        # SEND
         # =================================================
 
         await app.send_photo(
@@ -489,7 +547,7 @@ async def join_request_welcome(
     except Exception as ex:
 
         print(
-            f"[JOIN REQUEST] {ex}"
+            f"[JOIN REQUEST ERROR] {ex}"
         )
 
 
@@ -498,7 +556,7 @@ async def join_request_welcome(
 # =======================================================
 
 @app.on_message(
-    filters.command(["start"])
+    filters.command("start")
     & filters.group
     & ~BANNED_USERS
 )
@@ -554,10 +612,12 @@ async def welcome(
             _ = get_string(language)
 
             # ---------------------------------------------
-            # BANNED USER CHECK
+            # BANNED USER
             # ---------------------------------------------
 
-            if await is_banned_user(member.id):
+            if await is_banned_user(
+                member.id
+            ):
 
                 try:
                     await message.chat.ban_member(
@@ -590,7 +650,7 @@ async def welcome(
                     )
 
                 # -----------------------------------------
-                # BLACKLIST CHECK
+                # BLACKLIST
                 # -----------------------------------------
 
                 if (
@@ -616,7 +676,7 @@ async def welcome(
                     )
 
                 # -----------------------------------------
-                # BOT WELCOME
+                # WELCOME
                 # -----------------------------------------
 
                 out = start_panel(_)
@@ -642,7 +702,7 @@ async def welcome(
         except Exception as ex:
 
             print(
-                f"[WELCOME] {ex}"
+                f"[WELCOME ERROR] {ex}"
             )
 
 
