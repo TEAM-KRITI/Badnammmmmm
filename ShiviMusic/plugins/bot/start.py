@@ -109,8 +109,8 @@ START_BUTTONS = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(
-                text="🛒 𝐁ᴜʏ 𝐓ɢ 𝐀ᴄᴄᴏᴜɴᴛ ↗",
-                url="https://t.me/YourUsername",
+                text="🛒𝐒ᴜᴘᴘᴏʀᴛ 𝐂ʜᴀɴɴᴇʟ ↗",
+                url="https://t.me/annu_updates",
             )
         ],
     ]
