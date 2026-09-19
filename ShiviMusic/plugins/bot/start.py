@@ -7,7 +7,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from py_yt import VideosSearch
 
 import config
-from ShiviMusic import nand
+from ShiviMusic import Shivi 
 from ShiviMusic.misc import _boot_
 from ShiviMusic.plugins.sudo.sudoers import sudoers_list
 from ShiviMusic.utils.database import (
