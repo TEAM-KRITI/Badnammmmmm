@@ -7,10 +7,10 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from py_yt import VideosSearch
 
 import config
-from ShrutixMusic import nand
-from ShrutixMusic.misc import _boot_
-from ShrutixMusic.plugins.sudo.sudoers import sudoers_list
-from ShrutixMusic.utils.database import (
+from ShiviMusic import nand
+from ShiviMusic.misc import _boot_
+from ShiviMusic.plugins.sudo.sudoers import sudoers_list
+from ShiviMusic.utils.database import (
     add_served_chat,
     add_served_user,
     blacklisted_chats,
@@ -18,9 +18,9 @@ from ShrutixMusic.utils.database import (
     is_banned_user,
     is_on_off,
 )
-from ShrutixMusic.utils.decorators.language import LanguageStart
-from ShrutixMusic.utils.formatters import get_readable_time
-from ShrutixMusic.utils.inline import help_pannel, private_panel, start_panel
+from ShiviMusic.utils.decorators.language import LanguageStart
+from ShiviMusic.utils.formatters import get_readable_time
+from ShiviMusic.utils.inline import help_pannel, private_panel, start_panel
 from config import BANNED_USERS
 from strings import get_string
 
