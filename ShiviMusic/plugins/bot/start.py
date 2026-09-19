@@ -32,7 +32,7 @@ MESSAGE_EFFECTS = [
 ]
 
 
-@nand.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
+@Shivi.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
@@ -106,7 +106,7 @@ async def start_pm(client, message: Message, _):
         )
 
 
-@nand.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
+@Shivi.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
@@ -119,7 +119,7 @@ async def start_gp(client, message: Message, _):
     return await add_served_chat(message.chat.id)
 
 
-@nand.on_message(filters.new_chat_members, group=-1)
+@Shivi.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
     for member in message.new_chat_members:
         try:
@@ -150,9 +150,9 @@ async def welcome(client, message: Message):
                     photo=config.START_IMG_URL,
                     caption=_["start_3"].format(
                         message.from_user.first_name,
-                        nand.mention,
+                        Shivi.mention,
                         message.chat.title,
-                        nand.mention,
+                        Shivi.mention,
                     ),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
