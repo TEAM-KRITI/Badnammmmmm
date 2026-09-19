@@ -17,9 +17,9 @@ from pytgcalls.types.input_stream.quality import HighQualityAudio, MediumQuality
 from pytgcalls.types.stream import StreamAudioEnded
 
 import config
-from ShrutixMusic import LOGGER, YouTube, nand
-from ShrutixMusic.misc import db
-from ShrutixMusic.utils.database import (
+from ShiviMusic import LOGGER, YouTube, nand
+from ShiviMusic.misc import db
+from ShiviMusic.utils.database import (
     add_active_chat,
     add_active_video_chat,
     get_lang,
@@ -32,13 +32,13 @@ from ShrutixMusic.utils.database import (
     remove_active_video_chat,
     set_loop,
 )
-from ShrutixMusic.utils.exceptions import AssistantErr
-from ShrutixMusic.utils.formatters import check_duration, seconds_to_min, speed_converter
-from ShrutixMusic.utils.rich_stream import send_now_playing_rich
-from ShrutixMusic.utils.stream.autoclear import auto_clean
-from ShrutixMusic.utils.stream.autoplay import try_autoplay
-from ShrutixMusic.utils.stream.history import record_played
-from ShrutixMusic.utils.thumbnails import get_thumb
+from ShiviMusic.utils.exceptions import AssistantErr
+from ShiviMusic.utils.formatters import check_duration, seconds_to_min, speed_converter
+from ShiviMusic.utils.rich_stream import send_now_playing_rich
+from ShiviMusic.utils.stream.autoclear import auto_clean
+from ShiviMusic.utils.stream.autoplay import try_autoplay
+from ShiviMusic.utils.stream.history import record_played
+from ShiviMusic.utils.thumbnails import get_thumb
 from strings import get_string
 
 autoend = {}
@@ -66,7 +66,7 @@ def _silence_path():
 class Call(PyTgCalls):
     def __init__(self):
         self.userbot1 = Client(
-            name="ShrutiXAss1",
+            name="ShiviXAss1",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING1),
@@ -76,7 +76,7 @@ class Call(PyTgCalls):
             cache_duration=100,
         )
         self.userbot2 = Client(
-            name="ShrutiXAss2",
+            name="ShiviAss2",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING2),
@@ -86,7 +86,7 @@ class Call(PyTgCalls):
             cache_duration=100,
         )
         self.userbot3 = Client(
-            name="ShrutiXAss3",
+            name="ShiviXAss3",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING3),
@@ -96,7 +96,7 @@ class Call(PyTgCalls):
             cache_duration=100,
         )
         self.userbot4 = Client(
-            name="ShrutiXAss4",
+            name="ShiviXAss4",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING4),
@@ -106,7 +106,7 @@ class Call(PyTgCalls):
             cache_duration=100,
         )
         self.userbot5 = Client(
-            name="ShrutiXAss5",
+            name="ShiviXAss5",
             api_id=config.API_ID,
             api_hash=config.API_HASH,
             session_string=str(config.STRING5),
@@ -668,4 +668,4 @@ class Call(PyTgCalls):
             await self.change_stream(client, update.chat_id)
 
 
-Shruti = Call()
+Shivi = Call()
