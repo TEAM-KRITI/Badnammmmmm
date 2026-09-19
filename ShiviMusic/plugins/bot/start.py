@@ -1,25 +1,16 @@
-# =======================================================
-# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 🚀
-
-# This source code is under MIT License 📜 Unauthorized forking, importing, or using this code without giving proper credit will result in legal action ⚠️
- 
-# 📩 DM for permission : @TheSigmaCoder
-# =======================================================
-
-import time
 import random
+import time
+
 from pyrogram import filters
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from py_yt import VideosSearch
 
 import config
-from ShiviMusic import app
-from ShiviMusic.misc import _boot_
-from ShiviMusic.plugins.sudo.sudoers import sudoers_list
-from ShiviMusic.utils.database import get_served_chats, get_served_users
-from ShiviMusic.utils import bot_sys_stats
-from ShiviMusic.utils.database import (
+from ShrutixMusic import nand
+from ShrutixMusic.misc import _boot_
+from ShrutixMusic.plugins.sudo.sudoers import sudoers_list
+from ShrutixMusic.utils.database import (
     add_served_chat,
     add_served_user,
     blacklisted_chats,
@@ -27,122 +18,108 @@ from ShiviMusic.utils.database import (
     is_banned_user,
     is_on_off,
 )
-from ShiviMusic.utils.decorators.language import LanguageStart
-from ShiviMusic.utils.formatters import get_readable_time
-from ShiviMusic.utils.inline import help_pannel, private_panel, start_panel
+from ShrutixMusic.utils.decorators.language import LanguageStart
+from ShrutixMusic.utils.formatters import get_readable_time
+from ShrutixMusic.utils.inline import help_pannel, private_panel, start_panel
 from config import BANNED_USERS
 from strings import get_string
 
-
-shivi_PIC = [
-    "https://d.uguu.se/AHWUtCcF.jpg",
-    "https://h.uguu.se/oCKonQPF.jpg",
-    "https://o.uguu.se/ZKmYOtBA.jpg",
-    "https://o.uguu.se/ZKmYOtBA.jpg",
-    "https://d.uguu.se/CPlUJSEp.jpg",
-    "https://h.uguu.se/LSyRfkrb.jpg",
-    "https://h.uguu.se/ALtehGVn.jpg",
-    "https://d.uguu.se/TOCZFbxQ.jpg"
+MESSAGE_EFFECTS = [
+    5107584321108051014,
+    5159385139981059251,
+    5104841245755180586,
+    5046509860389126442,
 ]
 
 
-
-@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
+@nand.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
     await add_served_user(message.from_user.id)
-    
-    
-    try:
-        await message.delete()
-    except:
-        pass
-    
-    if len(message.text.split()) > 1:
-        name = message.text.split(None, 1)[1]
-        
-        if name[0:4] == "help":
-            keyboard = help_pannel(_)
-            return await message.reply_photo(
-                random.choice(shivi_PIC),
-                caption=_["help_1"].format(config.SUPPORT_CHAT),
-                reply_markup=keyboard,
+    effect_id = random.choice(MESSAGE_EFFECTS)
+    name = message.text.split(None, 1)[1] if len(message.text.split()) > 1 else ""
+    if name[0:4] == "help":
+        keyboard = help_pannel(_)
+        return await message.reply_photo(
+            photo=config.START_IMG_URL,
+            caption=_["help_1"].format(config.SUPPORT_CHAT),
+            reply_markup=keyboard,
+            effect_id=effect_id,
+        )
+    if name[0:3] == "sud":
+        await sudoers_list(client=client, message=message, _=_)
+        if await is_on_off(2):
+            return await nand.send_message(
+                chat_id=config.LOGGER_ID,
+                text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
             )
-            
-        if name[0:3] == "sud":
-            await sudoers_list(client=client, message=message, _=_)
-            if await is_on_off(2):
-                return await app.send_message(
-                    chat_id=config.LOGGER_ID,
-                    text=f"✦ {message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>✦ ᴜsᴇʀ ɪᴅ ➠</b> <code>{message.from_user.id}</code>\n<b>✦ ᴜsᴇʀɴᴀᴍᴇ ➠</b> @{message.from_user.username}",
-                )
-            return
-            
-        if name[0:3] == "inf":
-            m = await message.reply_text("🔎")
-            query = (str(name)).replace("info_", "", 1)
-            query = f"https://www.youtube.com/watch?v={query}"
-            results = VideosSearch(query, limit=1)
-            for result in (await results.next())["result"]:
-                title = result["title"]
-                duration = result["duration"]
-                views = result["viewCount"]["short"]
-                thumbnail = result["thumbnails"][0]["url"].split("?")[0]
-                channellink = result["channel"]["link"]
-                channel = result["channel"]["name"]
-                link = result["link"]
-                published = result["publishedTime"]
-            searched_text = _["start_6"].format(
-                title, duration, views, published, channellink, channel, app.mention
-            )
-            key = InlineKeyboardMarkup(
+        return
+    if name[0:3] == "inf":
+        m = await message.reply_text("🔎")
+        query = (str(name)).replace("info_", "", 1)
+        query = f"https://www.youtube.com/watch?v={query}"
+        results = VideosSearch(query, limit=1)
+        for result in (await results.next())["result"]:
+            title = result["title"]
+            duration = result["duration"]
+            views = result["viewCount"]["short"]
+            thumbnail = result["thumbnails"][0]["url"].split("?")[0]
+            channellink = result["channel"]["link"]
+            channel = result["channel"]["name"]
+            link = result["link"]
+            published = result["publishedTime"]
+        searched_text = _["start_6"].format(
+            title, duration, views, published, channellink, channel, nand.mention
+        )
+        key = InlineKeyboardMarkup(
+            [
                 [
-                    [
-                        InlineKeyboardButton(text=_["S_B_8"], url=link),
-                        InlineKeyboardButton(text=_["S_B_9"], url=config.SUPPORT_CHAT),
-                    ],
-                ]
-            )
-            await m.delete()
-            await app.send_photo(
-                chat_id=message.chat.id,
-                photo=thumbnail,
-                caption=searched_text,
-                reply_markup=key,
-            )
-            if await is_on_off(2):
-                return await app.send_message(
-                    chat_id=config.LOGGER_ID,
-                    text=f"✦ {message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n✦ <b>ᴜsᴇʀ ɪᴅ ➠</b> <code>{message.from_user.id}</code>\n✦ <b>ᴜsᴇʀɴᴀᴍᴇ ➠</b> @{message.from_user.username}",
-                )
-                
-    else:
-        out = private_panel(_)
-        await message.reply_photo(
-            random.choice(shivi_PIC),
-            caption=_["start_2"].format(message.from_user.mention, app.mention),
-            reply_markup=InlineKeyboardMarkup(out),
+                    InlineKeyboardButton(text=_["S_B_8"], url=link),
+                    InlineKeyboardButton(text=_["S_B_9"], url=config.SUPPORT_CHAT),
+                ],
+            ]
+        )
+        await m.delete()
+        await nand.send_photo(
+            chat_id=message.chat.id,
+            photo=thumbnail,
+            caption=searched_text,
+            reply_markup=key,
         )
         if await is_on_off(2):
-            return await app.send_message(
+            await nand.send_message(
                 chat_id=config.LOGGER_ID,
-                text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
             )
+        return
+    out = private_panel(_)
+    await message.reply_photo(
+        photo=config.START_IMG_URL,
+        caption=_["start_2"].format(message.from_user.mention, nand.mention),
+        reply_markup=InlineKeyboardMarkup(out),
+        effect_id=effect_id,
+    )
+    if await is_on_off(2):
+        return await nand.send_message(
+            chat_id=config.LOGGER_ID,
+            text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+        )
 
-@app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
+
+@nand.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
     uptime = int(time.time() - _boot_)
     await message.reply_photo(
-        random.choice(shivi_PIC),
-        caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
+        photo=config.START_IMG_URL,
+        caption=_["start_1"].format(nand.mention, get_readable_time(uptime)),
         reply_markup=InlineKeyboardMarkup(out),
     )
     return await add_served_chat(message.chat.id)
 
 
-@app.on_message(filters.new_chat_members, group=-1)
+@nand.on_message(filters.new_chat_members, group=-1)
 async def welcome(client, message: Message):
     for member in message.new_chat_members:
         try:
@@ -153,28 +130,29 @@ async def welcome(client, message: Message):
                     await message.chat.ban_member(member.id)
                 except:
                     pass
-            if member.id == app.id:
+            if member.id == nand.id:
                 if message.chat.type != ChatType.SUPERGROUP:
                     await message.reply_text(_["start_4"])
-                    return await app.leave_chat(message.chat.id)
+                    return await nand.leave_chat(message.chat.id)
                 if message.chat.id in await blacklisted_chats():
                     await message.reply_text(
                         _["start_5"].format(
-                            app.mention,
-                            f"https://t.me/{app.username}?start=sudolist",
+                            nand.mention,
+                            f"https://t.me/{nand.username}?start=sudolist",
                             config.SUPPORT_CHAT,
                         ),
                         disable_web_page_preview=True,
                     )
-                    return await app.leave_chat(message.chat.id)
+                    return await nand.leave_chat(message.chat.id)
 
                 out = start_panel(_)
-                await message.reply_text(
-                    text=_["start_3"].format(
-                        message.from_user.mention,
-                        app.mention,
+                await message.reply_photo(
+                    photo=config.START_IMG_URL,
+                    caption=_["start_3"].format(
+                        message.from_user.first_name,
+                        nand.mention,
                         message.chat.title,
-                        app.mention,
+                        nand.mention,
                     ),
                     reply_markup=InlineKeyboardMarkup(out),
                 )
@@ -182,12 +160,3 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
-
-
-# ======================================================
-# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 😎
-
-# 🧑‍💻 Developer : t.me/TheSigmaCoder
-# 🔗 Source link : GitHub.com/Im-Notcoder/Purvi-V3
-# 📢 Telegram channel : t.me/Purvi_Bots
-# =======================================================
