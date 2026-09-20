@@ -327,7 +327,7 @@ class Call(PyTgCalls):
             file_path if direct else f"vid_{track['vidid']}",
             title,
             duration_min,
-            "🔁 ᴋɪʀᴛɪ-ʙᴏᴛs",
+            "ᴀᴜᴛᴏᴘʟᴀʏ ✦",
             track["vidid"],
             1,
             "audio",
@@ -360,7 +360,7 @@ class Call(PyTgCalls):
                     f"https://t.me/{app.username}?start=info_{track['vidid']}",
                     title[:23],
                     duration_min,
-                    "ᴋɪʀᴛɪ-ʙᴏᴛs",
+                    "ᴀᴜᴛᴏᴘʟᴀʏ ✦",
                 ),
                 reply_markup=InlineKeyboardMarkup(button),
             )
