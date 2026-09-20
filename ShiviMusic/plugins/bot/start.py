@@ -35,14 +35,14 @@ from strings import get_string
 
 
 shivi_PIC = [
-    "https://files.catbox.moe/o2ys7l.jpg",
-    "https://files.catbox.moe/o2ys7l.jpg",
-    "https://files.catbox.moe/o2ys7l.jpg",
-    "https://files.catbox.moe/o2ys7l.jpg",
-    "https://files.catbox.moe/o2ys7l.jpg",
-    "https://files.catbox.moe/o2ys7l.jpg",
-    "https://files.catbox.moe/o2ys7l.jpg",
-    "https://files.catbox.moe/o2ys7l.jpg"
+    "https://files.catbox.moe/4ojtc4.jpg",
+    "https://files.catbox.moe/30wg78.jpg",
+    "https://files.catbox.moe/4ojtc4.jpg",
+    "https://files.catbox.moe/30wg78.jpg",
+    "https://files.catbox.moe/4ojtc4.jpg",
+    "https://files.catbox.moe/30wg78.jpg",
+    "https://files.catbox.moe/4ojtc4.jpg",
+    "https://files.catbox.moe/30wg78.jpg"
 ]
 
 
