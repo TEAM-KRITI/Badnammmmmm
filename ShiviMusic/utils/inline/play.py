@@ -5,15 +5,14 @@ from pyrogram import enums
 from pyrogram.types import InlineKeyboardButton
 
 from ShiviMusic.utils.formatters import time_to_seconds
-from ShiviMusic import app
 
 
 # =========================================================
 # SUPPORT & DONATE LINKS
 # =========================================================
 
-SUPPORT_URL = "https://t.me/annu_updates"
-DONATE_URL = "https://t.me/annu_support"
+SUPPORT_URL = "https://t.me/annu_support"
+DONATE_URL = "https://t.me/annu_updates"
 
 
 # =========================================================
@@ -33,6 +32,7 @@ STYLES = [
 
 def track_markup(_, videoid, user_id, channel, fplay):
     alone_style = random.choice(STYLES)
+
     group_style = random.choice(
         [s for s in STYLES if s != alone_style]
     )
@@ -42,26 +42,28 @@ def track_markup(_, videoid, user_id, channel, fplay):
             InlineKeyboardButton(
                 text=_["P_B_1"],
                 callback_data=(
-                    f"MusicStream {videoid}|{user_id}|a|{channel}|{fplay}"
+                    f"MusicStream "
+                    f"{videoid}|{user_id}|a|{channel}|{fplay}"
                 ),
                 style=group_style,
             ),
             InlineKeyboardButton(
                 text=_["P_B_2"],
                 callback_data=(
-                    f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}"
+                    f"MusicStream "
+                    f"{videoid}|{user_id}|v|{channel}|{fplay}"
                 ),
                 style=group_style,
             ),
         ],
         [
             InlineKeyboardButton(
-                text="💬 Support",
+                text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
                 style=group_style,
             ),
             InlineKeyboardButton(
-                text="💝 Donate",
+                text="Uᴘᴅᴀᴛᴇ",
                 url=DONATE_URL,
                 style=group_style,
             ),
@@ -184,22 +186,17 @@ def stream_markup_timer(_, chat_id, played, dur):
         ],
         [
             InlineKeyboardButton(
-                text="➕ ᴀᴅᴅ ᴍᴇ",
-                url=f"https://t.me/{app.username}?startgroup=true",
+                text="Sᴜᴘᴘᴏʀᴛ",
+                url=SUPPORT_URL,
                 style=style_close,
             ),
             InlineKeyboardButton(
-                text="💬 Support",
-                url=SUPPORT_URL,
+                text="Uᴘᴅᴀᴛᴇ",
+                url=DONATE_URL,
                 style=style_close,
             ),
         ],
         [
-            InlineKeyboardButton(
-                text="💝 Donate",
-                url=DONATE_URL,
-                style=style_close,
-            ),
             InlineKeyboardButton(
                 text=_["CLOSE_BUTTON"],
                 callback_data="close",
@@ -267,22 +264,17 @@ def stream_markup(_, chat_id):
         ],
         [
             InlineKeyboardButton(
-                text="➕ ᴀᴅᴅ ᴍᴇ",
-                url=f"https://t.me/{app.username}?startgroup=true",
+                text="Sᴜᴘᴘᴏʀᴛ",
+                url=SUPPORT_URL,
                 style=style_close,
             ),
             InlineKeyboardButton(
-                text="💬 Support",
-                url=SUPPORT_URL,
+                text="Uᴘᴅᴀᴛᴇ",
+                url=DONATE_URL,
                 style=style_close,
             ),
         ],
         [
-            InlineKeyboardButton(
-                text="💝 Donate",
-                url=DONATE_URL,
-                style=style_close,
-            ),
             InlineKeyboardButton(
                 text=_["CLOSE_BUTTON"],
                 callback_data="close",
@@ -300,6 +292,7 @@ def stream_markup(_, chat_id):
 
 def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
     alone_style = random.choice(STYLES)
+
     group_style = random.choice(
         [s for s in STYLES if s != alone_style]
     )
@@ -325,12 +318,12 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
         ],
         [
             InlineKeyboardButton(
-                text="💬 Support",
+                text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
                 style=group_style,
             ),
             InlineKeyboardButton(
-                text="💝 Donate",
+                text="Uᴘᴅᴀᴛᴇ",
                 url=DONATE_URL,
                 style=group_style,
             ),
@@ -367,12 +360,12 @@ def livestream_markup(_, videoid, user_id, mode, channel, fplay):
         ],
         [
             InlineKeyboardButton(
-                text="💬 Support",
+                text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
                 style=alone_style,
             ),
             InlineKeyboardButton(
-                text="💝 Donate",
+                text="Uᴘᴅᴀᴛᴇ",
                 url=DONATE_URL,
                 style=alone_style,
             ),
@@ -403,6 +396,7 @@ def slider_markup(
     fplay,
 ):
     alone_style = random.choice(STYLES)
+
     group_style = random.choice(
         [s for s in STYLES if s != alone_style]
     )
@@ -453,12 +447,12 @@ def slider_markup(
         ],
         [
             InlineKeyboardButton(
-                text="💬 Support",
+                text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
                 style=group_style,
             ),
             InlineKeyboardButton(
-                text="💝 Donate",
+                text="Uᴘᴅᴀᴛᴇ",
                 url=DONATE_URL,
                 style=group_style,
             ),
