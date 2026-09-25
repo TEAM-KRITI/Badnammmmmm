@@ -13,7 +13,7 @@ from ShiviMusic.utils.formatters import time_to_seconds
 SUPPORT_URL = "https://t.me/annu_support"
 UPDATE_URL = "https://t.me/annu_updates"
 
-# Apne bot ka username yahan @ ke bina rakhein
+# @ ke bina bot username
 BOT_USERNAME = "YourMusicBot"
 
 
@@ -82,7 +82,7 @@ def track_markup(_, videoid, user_id, channel, fplay):
 def _progress_bar(played_sec, duration_sec):
 
     if not duration_sec:
-        return "│━━━━━━━━━●│"
+        return "│●━━━━━━━━━│"
 
     percentage = (played_sec / duration_sec) * 100
     percentage = max(0, min(100, percentage))
@@ -105,6 +105,36 @@ def _progress_bar(played_sec, duration_sec):
 
 
 # =========================================================
+# CLOSE BUTTON
+# =========================================================
+
+def close_button():
+
+    return [
+        InlineKeyboardButton(
+            text="✕ Cʟᴏsᴇ",
+            callback_data="close",
+            style=DANGER,
+        )
+    ]
+
+
+# =========================================================
+# ADD BOT BUTTON
+# =========================================================
+
+def add_bot_button():
+
+    return [
+        InlineKeyboardButton(
+            text="⊞ Aᴅᴅ Mᴇ Iɴ Yᴏᴜʀ Gʀᴏᴜᴘ ⊞",
+            url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
+            style=SUCCESS,
+        )
+    ]
+
+
+# =========================================================
 # STREAM MARKUP TIMER
 # =========================================================
 
@@ -114,7 +144,10 @@ def stream_markup_timer(_, chat_id, played, dur):
     duration_sec = time_to_seconds(dur)
 
     if duration_sec:
-        played_sec = max(0, min(played_sec, duration_sec))
+        played_sec = max(
+            0,
+            min(played_sec, duration_sec)
+        )
 
     remaining_sec = max(
         0,
@@ -131,22 +164,24 @@ def stream_markup_timer(_, chat_id, played, dur):
         duration_sec
     )
 
-    # =====================================================
-    # SCREENSHOT STYLE
-    # =====================================================
-
     buttons = [
 
-        # Progress
+        # =================================================
+        # PROGRESS
+        # =================================================
+
         [
             InlineKeyboardButton(
-                text=f"{played}  {bar}  {remaining}",
+                text=f"{played} {bar} {remaining}",
                 callback_data="bot_info_data",
                 style=PRIMARY,
             )
         ],
 
-        # Main Controls
+        # =================================================
+        # MAIN CONTROLS
+        # =================================================
+
         [
             InlineKeyboardButton(
                 text="▷",
@@ -175,7 +210,10 @@ def stream_markup_timer(_, chat_id, played, dur):
             ),
         ],
 
-        # Seek Controls
+        # =================================================
+        # SEEK / RECORD
+        # =================================================
+
         [
             InlineKeyboardButton(
                 text="‹ 20ˢ",
@@ -194,7 +232,10 @@ def stream_markup_timer(_, chat_id, played, dur):
             ),
         ],
 
-        # Fav / Auto
+        # =================================================
+        # FAVOURITE / AUTOPLAY
+        # =================================================
+
         [
             InlineKeyboardButton(
                 text="♥ Fᴀᴠ",
@@ -208,14 +249,17 @@ def stream_markup_timer(_, chat_id, played, dur):
             ),
         ],
 
-        # Add Bot
-        [
-            InlineKeyboardButton(
-                text="⊞ Aᴅᴅ Mᴇ Iɴ Yᴏᴜʀ Gʀᴏᴜᴘ ⊞",
-                url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-                style=SUCCESS,
-            )
-        ],
+        # =================================================
+        # ADD BOT
+        # =================================================
+
+        add_bot_button(),
+
+        # =================================================
+        # CLOSE
+        # =================================================
+
+        close_button(),
     ]
 
     return buttons
@@ -229,7 +273,10 @@ def stream_markup(_, chat_id):
 
     buttons = [
 
-        # Main Controls
+        # =================================================
+        # MAIN CONTROLS
+        # =================================================
+
         [
             InlineKeyboardButton(
                 text="▷",
@@ -258,7 +305,10 @@ def stream_markup(_, chat_id):
             ),
         ],
 
-        # Seek
+        # =================================================
+        # SEEK / RECORD
+        # =================================================
+
         [
             InlineKeyboardButton(
                 text="‹ 20ˢ",
@@ -277,7 +327,10 @@ def stream_markup(_, chat_id):
             ),
         ],
 
-        # Favourite / Autoplay
+        # =================================================
+        # FAV / AUTO
+        # =================================================
+
         [
             InlineKeyboardButton(
                 text="♥ Fᴀᴠ",
@@ -291,14 +344,17 @@ def stream_markup(_, chat_id):
             ),
         ],
 
-        # Add Bot
-        [
-            InlineKeyboardButton(
-                text="⊞ Aᴅᴅ Mᴇ Iɴ Yᴏᴜʀ Gʀᴏᴜᴘ ⊞",
-                url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-                style=SUCCESS,
-            ),
-        ],
+        # =================================================
+        # ADD BOT
+        # =================================================
+
+        add_bot_button(),
+
+        # =================================================
+        # CLOSE
+        # =================================================
+
+        close_button(),
     ]
 
     return buttons
@@ -308,7 +364,14 @@ def stream_markup(_, chat_id):
 # PLAYLIST MARKUP
 # =========================================================
 
-def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
+def playlist_markup(
+    _,
+    videoid,
+    user_id,
+    ptype,
+    channel,
+    fplay,
+):
 
     buttons = [
         [
@@ -375,7 +438,7 @@ def livestream_markup(
                     f"{videoid}|{user_id}|{mode}|{channel}|{fplay}"
                 ),
                 style=PRIMARY,
-            )
+            ),
         ],
         [
             InlineKeyboardButton(
@@ -436,7 +499,6 @@ def slider_markup(
                 style=PRIMARY,
             ),
         ],
-
         [
             InlineKeyboardButton(
                 text="◁",
@@ -460,7 +522,6 @@ def slider_markup(
                 style=PRIMARY,
             ),
         ],
-
         [
             InlineKeyboardButton(
                 text="Sᴜᴘᴘᴏʀᴛ",
