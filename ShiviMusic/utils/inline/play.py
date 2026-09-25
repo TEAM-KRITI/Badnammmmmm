@@ -1,5 +1,4 @@
 import math
-import random
 
 from pyrogram import enums
 from pyrogram.types import InlineKeyboardButton
@@ -8,22 +7,23 @@ from ShiviMusic.utils.formatters import time_to_seconds
 
 
 # =========================================================
-# SUPPORT & DONATE LINKS
+# LINKS
 # =========================================================
 
 SUPPORT_URL = "https://t.me/annu_support"
-DONATE_URL = "https://t.me/annu_updates"
+UPDATE_URL = "https://t.me/annu_updates"
+
+# Apne bot ka username yahan @ ke bina rakhein
+BOT_USERNAME = "YourMusicBot"
 
 
 # =========================================================
 # BUTTON STYLES
 # =========================================================
 
-STYLES = [
-    enums.ButtonStyle.PRIMARY,
-    enums.ButtonStyle.SUCCESS,
-    enums.ButtonStyle.DANGER,
-]
+PRIMARY = enums.ButtonStyle.PRIMARY
+SUCCESS = enums.ButtonStyle.SUCCESS
+DANGER = enums.ButtonStyle.DANGER
 
 
 # =========================================================
@@ -31,11 +31,6 @@ STYLES = [
 # =========================================================
 
 def track_markup(_, videoid, user_id, channel, fplay):
-    alone_style = random.choice(STYLES)
-
-    group_style = random.choice(
-        [s for s in STYLES if s != alone_style]
-    )
 
     buttons = [
         [
@@ -45,7 +40,7 @@ def track_markup(_, videoid, user_id, channel, fplay):
                     f"MusicStream "
                     f"{videoid}|{user_id}|a|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text=_["P_B_2"],
@@ -53,26 +48,26 @@ def track_markup(_, videoid, user_id, channel, fplay):
                     f"MusicStream "
                     f"{videoid}|{user_id}|v|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
         ],
         [
             InlineKeyboardButton(
                 text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
-                style=group_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text="Uᴘᴅᴀᴛᴇ",
-                url=DONATE_URL,
-                style=group_style,
+                url=UPDATE_URL,
+                style=PRIMARY,
             ),
         ],
         [
             InlineKeyboardButton(
                 text=_["CLOSE_BUTTON"],
                 callback_data=f"forceclose {videoid}|{user_id}",
-                style=alone_style,
+                style=DANGER,
             ),
         ],
     ]
@@ -81,127 +76,145 @@ def track_markup(_, videoid, user_id, channel, fplay):
 
 
 # =========================================================
+# PROGRESS BAR
+# =========================================================
+
+def _progress_bar(played_sec, duration_sec):
+
+    if not duration_sec:
+        return "│━━━━━━━━━●│"
+
+    percentage = (played_sec / duration_sec) * 100
+    percentage = max(0, min(100, percentage))
+
+    position = int(percentage // 10)
+
+    if position <= 0:
+        return "│●━━━━━━━━━│"
+
+    if position >= 10:
+        return "│━━━━━━━━━●│"
+
+    return (
+        "│"
+        + "━" * position
+        + "●"
+        + "━" * (9 - position)
+        + "│"
+    )
+
+
+# =========================================================
 # STREAM MARKUP TIMER
 # =========================================================
 
 def stream_markup_timer(_, chat_id, played, dur):
-    style_progress = random.choice(STYLES)
-    style_controls = random.choice(STYLES)
-    style_seek = random.choice(STYLES)
-    style_close = random.choice(STYLES)
 
     played_sec = time_to_seconds(played)
     duration_sec = time_to_seconds(dur)
 
-    remaining_sec = duration_sec - played_sec
+    if duration_sec:
+        played_sec = max(0, min(played_sec, duration_sec))
 
-    if remaining_sec < 0:
-        remaining_sec = 0
+    remaining_sec = max(
+        0,
+        duration_sec - played_sec
+    )
 
     rem_min = remaining_sec // 60
     rem_sec = remaining_sec % 60
 
     remaining = f"{rem_min:02d}:{rem_sec:02d}"
 
-    percentage = (
-        (played_sec / duration_sec) * 100
-        if duration_sec
-        else 0
+    bar = _progress_bar(
+        played_sec,
+        duration_sec
     )
 
-    umm = math.floor(percentage)
-
-    if 0 < umm <= 10:
-        bar = "|♬—————————| -"
-    elif 10 < umm < 20:
-        bar = "|—♬————————| -"
-    elif 20 <= umm < 30:
-        bar = "|——♬———————| -"
-    elif 30 <= umm < 40:
-        bar = "|———♬——————| -"
-    elif 40 <= umm < 50:
-        bar = "|————♬—————| -"
-    elif 50 <= umm < 60:
-        bar = "|—————♬————| -"
-    elif 60 <= umm < 70:
-        bar = "|——————♬———| -"
-    elif 70 <= umm < 80:
-        bar = "|———————♬——| -"
-    elif 80 <= umm < 95:
-        bar = "|————————♬—| -"
-    else:
-        bar = "|—————————♬| -"
+    # =====================================================
+    # SCREENSHOT STYLE
+    # =====================================================
 
     buttons = [
+
+        # Progress
         [
             InlineKeyboardButton(
-                text=f"{played} {bar} {remaining}",
+                text=f"{played}  {bar}  {remaining}",
                 callback_data="bot_info_data",
-                style=style_progress,
-            ),
+                style=PRIMARY,
+            )
         ],
+
+        # Main Controls
         [
             InlineKeyboardButton(
                 text="▷",
                 callback_data=f"ADMIN Resume|{chat_id}",
-                style=style_controls,
+                style=SUCCESS,
             ),
             InlineKeyboardButton(
-                text="II",
+                text="Ⅱ",
                 callback_data=f"ADMIN Pause|{chat_id}",
-                style=style_controls,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text="↻",
                 callback_data=f"ADMIN Replay|{chat_id}",
-                style=style_controls,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="‣‣I",
+                text="▸|",
                 callback_data=f"ADMIN Skip|{chat_id}",
-                style=style_controls,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="▢",
+                text="□",
                 callback_data=f"ADMIN Stop|{chat_id}",
-                style=style_controls,
+                style=DANGER,
             ),
         ],
+
+        # Seek Controls
         [
             InlineKeyboardButton(
-                text="-20ˢ",
+                text="‹ 20ˢ",
                 callback_data=f"ADMIN SeekBack|{chat_id}",
-                style=style_seek,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="ɪɴғᴏ",
-                callback_data="bot_info_data",
-                style=style_seek,
+                text="🎵 REC",
+                callback_data=f"ADMIN Record|{chat_id}",
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="20ˢ+",
+                text="20ˢ ›",
                 callback_data=f"ADMIN SeekFwd|{chat_id}",
-                style=style_seek,
+                style=PRIMARY,
             ),
         ],
+
+        # Fav / Auto
         [
             InlineKeyboardButton(
-                text="Sᴜᴘᴘᴏʀᴛ",
-                url=SUPPORT_URL,
-                style=style_close,
+                text="♥ Fᴀᴠ",
+                callback_data=f"ADMIN Fav|{chat_id}",
+                style=DANGER,
             ),
             InlineKeyboardButton(
-                text="Uᴘᴅᴀᴛᴇ",
-                url=DONATE_URL,
-                style=style_close,
+                text="Aᴜᴛᴏ",
+                callback_data=f"ADMIN Auto|{chat_id}",
+                style=DANGER,
             ),
         ],
+
+        # Add Bot
         [
             InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"],
-                callback_data="close",
-                style=style_close,
-            ),
+                text="⊞ Aᴅᴅ Mᴇ Iɴ Yᴏᴜʀ Gʀᴏᴜᴘ ⊞",
+                url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
+                style=SUCCESS,
+            )
         ],
     ]
 
@@ -213,72 +226,77 @@ def stream_markup_timer(_, chat_id, played, dur):
 # =========================================================
 
 def stream_markup(_, chat_id):
-    style_controls = random.choice(STYLES)
-    style_seek = random.choice(STYLES)
-    style_close = random.choice(STYLES)
 
     buttons = [
+
+        # Main Controls
         [
             InlineKeyboardButton(
                 text="▷",
                 callback_data=f"ADMIN Resume|{chat_id}",
-                style=style_controls,
+                style=SUCCESS,
             ),
             InlineKeyboardButton(
-                text="II",
+                text="Ⅱ",
                 callback_data=f"ADMIN Pause|{chat_id}",
-                style=style_controls,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text="↻",
                 callback_data=f"ADMIN Replay|{chat_id}",
-                style=style_controls,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="‣‣I",
+                text="▸|",
                 callback_data=f"ADMIN Skip|{chat_id}",
-                style=style_controls,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="▢",
+                text="□",
                 callback_data=f"ADMIN Stop|{chat_id}",
-                style=style_controls,
+                style=DANGER,
             ),
         ],
+
+        # Seek
         [
             InlineKeyboardButton(
-                text="-20ˢ",
+                text="‹ 20ˢ",
                 callback_data=f"ADMIN SeekBack|{chat_id}",
-                style=style_seek,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="ɪɴғᴏ",
-                callback_data="api_status",
-                style=style_seek,
+                text="🎵 REC",
+                callback_data=f"ADMIN Record|{chat_id}",
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
-                text="20ˢ+",
+                text="20ˢ ›",
                 callback_data=f"ADMIN SeekFwd|{chat_id}",
-                style=style_seek,
+                style=PRIMARY,
             ),
         ],
+
+        # Favourite / Autoplay
         [
             InlineKeyboardButton(
-                text="Sᴜᴘᴘᴏʀᴛ",
-                url=SUPPORT_URL,
-                style=style_close,
+                text="♥ Fᴀᴠ",
+                callback_data=f"ADMIN Fav|{chat_id}",
+                style=DANGER,
             ),
             InlineKeyboardButton(
-                text="Uᴘᴅᴀᴛᴇ",
-                url=DONATE_URL,
-                style=style_close,
+                text="Aᴜᴛᴏ",
+                callback_data=f"ADMIN Auto|{chat_id}",
+                style=DANGER,
             ),
         ],
+
+        # Add Bot
         [
             InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"],
-                callback_data="close",
-                style=style_close,
+                text="⊞ Aᴅᴅ Mᴇ Iɴ Yᴏᴜʀ Gʀᴏᴜᴘ ⊞",
+                url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
+                style=SUCCESS,
             ),
         ],
     ]
@@ -291,11 +309,6 @@ def stream_markup(_, chat_id):
 # =========================================================
 
 def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
-    alone_style = random.choice(STYLES)
-
-    group_style = random.choice(
-        [s for s in STYLES if s != alone_style]
-    )
 
     buttons = [
         [
@@ -305,7 +318,7 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
                     f"ShiviPlaylists "
                     f"{videoid}|{user_id}|{ptype}|a|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text=_["P_B_2"],
@@ -313,26 +326,26 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
                     f"ShiviPlaylists "
                     f"{videoid}|{user_id}|{ptype}|v|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
         ],
         [
             InlineKeyboardButton(
                 text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
-                style=group_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text="Uᴘᴅᴀᴛᴇ",
-                url=DONATE_URL,
-                style=group_style,
+                url=UPDATE_URL,
+                style=PRIMARY,
             ),
         ],
         [
             InlineKeyboardButton(
                 text=_["CLOSE_BUTTON"],
                 callback_data=f"forceclose {videoid}|{user_id}",
-                style=alone_style,
+                style=DANGER,
             ),
         ],
     ]
@@ -344,8 +357,14 @@ def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
 # LIVESTREAM MARKUP
 # =========================================================
 
-def livestream_markup(_, videoid, user_id, mode, channel, fplay):
-    alone_style = random.choice(STYLES)
+def livestream_markup(
+    _,
+    videoid,
+    user_id,
+    mode,
+    channel,
+    fplay,
+):
 
     buttons = [
         [
@@ -355,26 +374,26 @@ def livestream_markup(_, videoid, user_id, mode, channel, fplay):
                     f"LiveStream "
                     f"{videoid}|{user_id}|{mode}|{channel}|{fplay}"
                 ),
-                style=alone_style,
-            ),
+                style=PRIMARY,
+            )
         ],
         [
             InlineKeyboardButton(
                 text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
-                style=alone_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text="Uᴘᴅᴀᴛᴇ",
-                url=DONATE_URL,
-                style=alone_style,
+                url=UPDATE_URL,
+                style=PRIMARY,
             ),
         ],
         [
             InlineKeyboardButton(
                 text=_["CLOSE_BUTTON"],
                 callback_data=f"forceclose {videoid}|{user_id}",
-                style=alone_style,
+                style=DANGER,
             ),
         ],
     ]
@@ -395,13 +414,8 @@ def slider_markup(
     channel,
     fplay,
 ):
-    alone_style = random.choice(STYLES)
 
-    group_style = random.choice(
-        [s for s in STYLES if s != alone_style]
-    )
-
-    query = f"{query[:20]}"
+    query = query[:20]
 
     buttons = [
         [
@@ -411,7 +425,7 @@ def slider_markup(
                     f"MusicStream "
                     f"{videoid}|{user_id}|a|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text=_["P_B_2"],
@@ -419,9 +433,10 @@ def slider_markup(
                     f"MusicStream "
                     f"{videoid}|{user_id}|v|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
         ],
+
         [
             InlineKeyboardButton(
                 text="◁",
@@ -429,12 +444,12 @@ def slider_markup(
                     f"slider B|{query_type}|{query}|"
                     f"{user_id}|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text=_["CLOSE_BUTTON"],
                 callback_data=f"forceclose {query}|{user_id}",
-                style=group_style,
+                style=DANGER,
             ),
             InlineKeyboardButton(
                 text="▷",
@@ -442,19 +457,20 @@ def slider_markup(
                     f"slider F|{query_type}|{query}|"
                     f"{user_id}|{channel}|{fplay}"
                 ),
-                style=group_style,
+                style=PRIMARY,
             ),
         ],
+
         [
             InlineKeyboardButton(
                 text="Sᴜᴘᴘᴏʀᴛ",
                 url=SUPPORT_URL,
-                style=group_style,
+                style=PRIMARY,
             ),
             InlineKeyboardButton(
                 text="Uᴘᴅᴀᴛᴇ",
-                url=DONATE_URL,
-                style=group_style,
+                url=UPDATE_URL,
+                style=PRIMARY,
             ),
         ],
     ]
