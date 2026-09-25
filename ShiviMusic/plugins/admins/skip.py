@@ -2,29 +2,109 @@
 # ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 🚀
 #
 # This source code is under MIT License 📜
-# ❌ Unauthorized forking, importing, or using this code
-#    without giving proper credit will result in legal action ⚠️
-#
-# 📩 DM for permission : @TheSigmaCoder
 # ===========================================================
 
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardMarkup, Message
 
 import config
+
 from ShiviMusic import YouTube, app
 from ShiviMusic.core.call import Shivi
 from ShiviMusic.misc import db
-from ShiviMusic.utils.database import get_loop, is_autoplay_on
+from ShiviMusic.utils.database import (
+    get_loop,
+    is_autoplay_on,
+)
 from ShiviMusic.utils.decorators import AdminRightsCheck
-from ShiviMusic.utils.inline import close_markup, stream_markup
+from ShiviMusic.utils.inline import (
+    close_markup,
+    stream_markup,
+)
 from ShiviMusic.utils.stream.autoclear import auto_clean
 from ShiviMusic.utils.thumbnails import get_thumb
 from config import BANNED_USERS
 
 
+# ===========================================================
+# HELPER
+# ===========================================================
+
+async def ensure_queue(chat_id: int):
+    """
+    Make sure db[chat_id] exists and contains a queue list.
+    """
+
+    if chat_id not in db:
+        db[chat_id] = []
+
+    if not isinstance(db[chat_id], list):
+        db[chat_id] = []
+
+    return db[chat_id]
+
+
+# ===========================================================
+# SAFE MESSAGE
+# ===========================================================
+
+async def stop_empty_stream(message: Message, chat_id: int, _):
+    """
+    Stop stream safely when queue becomes empty.
+    """
+
+    try:
+        await message.reply_text(
+            text=_["admin_6"].format(
+                message.from_user.mention,
+                message.chat.title,
+            ),
+            reply_markup=close_markup(_),
+        )
+    except Exception:
+        pass
+
+    try:
+        await Shivi.stop_stream(chat_id)
+    except Exception:
+        pass
+
+
+# ===========================================================
+# SAVE CURRENT STREAM MESSAGE
+# ===========================================================
+
+def save_current_stream(chat_id: int, run, markup_type: str):
+    """
+    Safely save the currently playing message.
+
+    Prevents:
+        IndexError: list index out of range
+    """
+
+    if chat_id not in db:
+        db[chat_id] = []
+
+    if not isinstance(db[chat_id], list):
+        db[chat_id] = []
+
+    if not db[chat_id]:
+        return False
+
+    db[chat_id][0]["mystic"] = run
+    db[chat_id][0]["markup"] = markup_type
+
+    return True
+
+
+# ===========================================================
+# SKIP COMMAND
+# ===========================================================
+
 @app.on_message(
-    filters.command(["skip", "cskip", "next", "cnext"])
+    filters.command(
+        ["skip", "cskip", "next", "cnext"]
+    )
     & filters.group
     & ~BANNED_USERS
 )
@@ -32,91 +112,139 @@ from config import BANNED_USERS
 async def skip(cli, message: Message, _, chat_id):
 
     # =======================================================
+    # MAKE SURE QUEUE EXISTS
+    # =======================================================
+
+    check = await ensure_queue(chat_id)
+
+    # =======================================================
+    # NO QUEUE
+    # =======================================================
+
+    if not check:
+
+        await stop_empty_stream(
+            message,
+            chat_id,
+            _,
+        )
+
+        return
+
+    # =======================================================
     # SKIP WITH NUMBER
     # =======================================================
 
-    if not len(message.command) < 2:
+    if len(message.command) >= 2:
 
         loop = await get_loop(chat_id)
 
         if loop != 0:
-            return await message.reply_text(_["admin_8"])
+            return await message.reply_text(
+                _["admin_8"]
+            )
 
-        state = message.text.split(None, 1)[1].strip()
+        state = message.text.split(
+            None,
+            1,
+        )[1].strip()
 
-        if state.isnumeric():
+        if not state.isnumeric():
 
-            state = int(state)
-            check = db.get(chat_id)
+            return await message.reply_text(
+                _["admin_9"]
+            )
 
-            if check:
+        state = int(state)
 
-                count = len(check)
+        count = len(check)
 
-                if count > 2:
+        # ---------------------------------------------------
+        # There must be a current song + requested queue
+        # ---------------------------------------------------
 
-                    count = int(count - 1)
+        if count <= 2:
 
-                    if 1 <= state <= count:
+            return await message.reply_text(
+                _["admin_10"]
+            )
 
-                        for x in range(state):
+        available = count - 1
 
-                            popped = None
+        if not 1 <= state <= available:
 
-                            try:
-                                popped = check.pop(0)
-                            except Exception:
-                                return await message.reply_text(_["admin_12"])
+            return await message.reply_text(
+                _["admin_11"].format(
+                    available
+                )
+            )
 
-                            if popped:
-                                await auto_clean(popped)
+        # ---------------------------------------------------
+        # Remove requested number of songs
+        # ---------------------------------------------------
 
-                            if not check:
+        for _index in range(state):
 
-                                started = False
+            if not check:
+                break
 
-                                if popped and await is_autoplay_on(chat_id):
+            popped = None
 
-                                    started = await Shivi.autoplay_start(
-                                        chat_id,
-                                        popped.get("chat_id", chat_id),
-                                        popped.get("title"),
-                                        popped.get("vidid"),
-                                    )
+            try:
+                popped = check.pop(0)
+            except Exception:
+                break
 
-                                if started:
-                                    return
+            if popped:
 
-                                try:
+                try:
+                    await auto_clean(popped)
+                except Exception:
+                    pass
 
-                                    await message.reply_text(
-                                        text=_["admin_6"].format(
-                                            message.from_user.mention,
-                                            message.chat.title,
-                                        ),
-                                        reply_markup=close_markup(_),
-                                    )
+        # ---------------------------------------------------
+        # Queue completely empty
+        # ---------------------------------------------------
 
-                                    await Shivi.stop_stream(chat_id)
+        if not check:
 
-                                except Exception:
-                                    pass
+            started = False
 
-                                return
+            # -----------------------------------------------
+            # AUTOPLAY
+            # -----------------------------------------------
 
-                    else:
-                        return await message.reply_text(
-                            _["admin_11"].format(count)
-                        )
+            if popped and await is_autoplay_on(chat_id):
 
-                else:
-                    return await message.reply_text(_["admin_10"])
+                try:
 
-            else:
-                return await message.reply_text(_["queue_2"])
+                    started = await Shivi.autoplay_start(
+                        chat_id,
+                        popped.get(
+                            "chat_id",
+                            chat_id,
+                        ),
+                        popped.get(
+                            "title"
+                        ),
+                        popped.get(
+                            "vidid"
+                        ),
+                    )
 
-        else:
-            return await message.reply_text(_["admin_9"])
+                except Exception:
+                    started = False
+
+            if started:
+                return
+
+            await stop_empty_stream(
+                message,
+                chat_id,
+                _,
+            )
+
+            return
 
     # =======================================================
     # NORMAL SKIP
@@ -124,101 +252,214 @@ async def skip(cli, message: Message, _, chat_id):
 
     else:
 
-        check = db.get(chat_id)
         popped = None
 
         try:
 
+            # -----------------------------------------------
+            # Safety check
+            # -----------------------------------------------
+
+            if not check:
+                await stop_empty_stream(
+                    message,
+                    chat_id,
+                    _,
+                )
+                return
+
+            # -----------------------------------------------
+            # Remove current song
+            # -----------------------------------------------
+
             popped = check.pop(0)
 
             if popped:
-                await auto_clean(popped)
-
-            if not check:
-
-                started = False
-
-                if await is_autoplay_on(chat_id):
-
-                    started = await Shivi.autoplay_start(
-                        chat_id,
-                        popped.get("chat_id", chat_id),
-                        popped.get("title"),
-                        popped.get("vidid"),
-                    )
-
-                if started:
-                    return
-
-                await message.reply_text(
-                    text=_["admin_6"].format(
-                        message.from_user.mention,
-                        message.chat.title,
-                    ),
-                    reply_markup=close_markup(_),
-                )
 
                 try:
-                    return await Shivi.stop_stream(chat_id)
+                    await auto_clean(popped)
                 except Exception:
-                    return
+                    pass
 
         except Exception:
 
-            try:
+            await stop_empty_stream(
+                message,
+                chat_id,
+                _,
+            )
 
-                await message.reply_text(
-                    text=_["admin_6"].format(
-                        message.from_user.mention,
-                        message.chat.title,
-                    ),
-                    reply_markup=close_markup(_),
-                )
+            return
 
-                return await Shivi.stop_stream(chat_id)
+        # ---------------------------------------------------
+        # Queue empty after skip
+        # ---------------------------------------------------
 
-            except Exception:
+        if not check:
+
+            started = False
+
+            # -----------------------------------------------
+            # AUTOPLAY
+            # -----------------------------------------------
+
+            if popped and await is_autoplay_on(chat_id):
+
+                try:
+
+                    started = await Shivi.autoplay_start(
+                        chat_id,
+                        popped.get(
+                            "chat_id",
+                            chat_id,
+                        ),
+                        popped.get(
+                            "title"
+                        ),
+                        popped.get(
+                            "vidid"
+                        ),
+                    )
+
+                except Exception:
+                    started = False
+
+            if started:
                 return
+
+            await stop_empty_stream(
+                message,
+                chat_id,
+                _,
+            )
+
+            return
+
+    # =======================================================
+    # FINAL SAFETY CHECK
+    # =======================================================
+
+    if not check:
+
+        await stop_empty_stream(
+            message,
+            chat_id,
+            _,
+        )
+
+        return
 
     # =======================================================
     # GET NEXT QUEUED SONG
     # =======================================================
 
-    queued = check[0]["file"]
-    title = (check[0]["title"]).title()
-    user = check[0]["by"]
-    streamtype = check[0]["streamtype"]
-    videoid = check[0]["vidid"]
+    try:
 
-    status = True if str(streamtype) == "video" else None
+        current = check[0]
 
-    db[chat_id][0]["played"] = 0
+        queued = current["file"]
+        title = (
+            current["title"]
+            or "Unknown"
+        ).title()
 
-    exis = check[0].get("old_dur")
+        user = current.get(
+            "by",
+            "Unknown",
+        )
 
-    if exis:
+        streamtype = current.get(
+            "streamtype",
+            "audio",
+        )
 
-        db[chat_id][0]["dur"] = exis
-        db[chat_id][0]["seconds"] = check[0]["old_second"]
-        db[chat_id][0]["speed_path"] = None
-        db[chat_id][0]["speed"] = 1.0
+        videoid = current.get(
+            "vidid"
+        )
+
+    except Exception:
+
+        await stop_empty_stream(
+            message,
+            chat_id,
+            _,
+        )
+
+        return
+
+    # =======================================================
+    # STREAM TYPE
+    # =======================================================
+
+    status = (
+        True
+        if str(streamtype) == "video"
+        else None
+    )
+
+    # =======================================================
+    # CURRENT SONG STATE
+    # =======================================================
+
+    try:
+
+        db[chat_id][0]["played"] = 0
+
+        exis = db[chat_id][0].get(
+            "old_dur"
+        )
+
+        if exis:
+
+            db[chat_id][0]["dur"] = exis
+
+            db[chat_id][0]["seconds"] = (
+                db[chat_id][0].get(
+                    "old_second",
+                    0,
+                )
+            )
+
+            db[chat_id][0]["speed_path"] = None
+            db[chat_id][0]["speed"] = 1.0
+
+    except Exception:
+        pass
 
     # =======================================================
     # LIVE STREAM
     # =======================================================
 
-    if "live_" in queued:
+    if queued and "live_" in queued:
 
-        n, link = await YouTube.video(videoid, True)
+        try:
+
+            n, link = await YouTube.video(
+                videoid,
+                True,
+            )
+
+        except Exception:
+
+            return await message.reply_text(
+                _["admin_7"].format(title)
+            )
 
         if n == 0:
+
             return await message.reply_text(
                 _["admin_7"].format(title)
             )
 
         try:
-            image = await YouTube.thumbnail(videoid, True)
+
+            image = await YouTube.thumbnail(
+                videoid,
+                True,
+            )
+
         except Exception:
+
             image = None
 
         try:
@@ -236,32 +477,51 @@ async def skip(cli, message: Message, _, chat_id):
                 _["call_6"]
             )
 
-        button = stream_markup(_, chat_id)
-        img = await get_thumb(videoid)
-
-        run = await message.reply_photo(
-            photo=img,
-            caption=_["stream_1"].format(
-                f"https://t.me/{app.username}?start=info_{videoid}",
-                title[:23],
-                check[0]["dur"],
-                user,
-            ),
-            reply_markup=InlineKeyboardMarkup(button),
+        button = stream_markup(
+            _,
+            chat_id,
         )
 
-        db[chat_id][0]["mystic"] = run
-        db[chat_id][0]["markup"] = "tg"
+        try:
+
+            img = await get_thumb(
+                videoid
+            )
+
+        except Exception:
+
+            img = config.STREAM_IMG_URL
+
+        try:
+
+            run = await message.reply_photo(
+                photo=img,
+                caption=_["stream_1"].format(
+                    f"https://t.me/{app.username}?start=info_{videoid}",
+                    title[:23],
+                    current.get("dur", "Unknown"),
+                    user,
+                ),
+                reply_markup=InlineKeyboardMarkup(
+                    button
+                ),
+            )
+
+            save_current_stream(
+                chat_id,
+                run,
+                "tg",
+            )
+
+        except Exception:
+            pass
 
     # =======================================================
     # VIDEO DOWNLOAD
     # =======================================================
 
-    elif "vid_" in queued:
+    elif queued and "vid_" in queued:
 
-        # FIX:
-        # Removed disable_web_page_preview=True because
-        # current Pyrogram version does not support it.
         mystic = await message.reply_text(
             _["call_7"]
         )
@@ -277,9 +537,14 @@ async def skip(cli, message: Message, _, chat_id):
 
         except Exception:
 
-            return await mystic.edit_text(
-                _["call_6"]
-            )
+            try:
+                await mystic.edit_text(
+                    _["call_6"]
+                )
+            except Exception:
+                pass
+
+            return
 
         try:
 
@@ -303,26 +568,53 @@ async def skip(cli, message: Message, _, chat_id):
 
         except Exception:
 
-            return await mystic.edit_text(
-                _["call_6"]
-            )
+            try:
+                await mystic.edit_text(
+                    _["call_6"]
+                )
+            except Exception:
+                pass
 
-        button = stream_markup(_, chat_id)
-        img = await get_thumb(videoid)
+            return
 
-        run = await message.reply_photo(
-            photo=img,
-            caption=_["stream_1"].format(
-                f"https://t.me/{app.username}?start=info_{videoid}",
-                title[:23],
-                check[0]["dur"],
-                user,
-            ),
-            reply_markup=InlineKeyboardMarkup(button),
+        button = stream_markup(
+            _,
+            chat_id,
         )
 
-        db[chat_id][0]["mystic"] = run
-        db[chat_id][0]["markup"] = "stream"
+        try:
+
+            img = await get_thumb(
+                videoid
+            )
+
+        except Exception:
+
+            img = config.STREAM_IMG_URL
+
+        try:
+
+            run = await message.reply_photo(
+                photo=img,
+                caption=_["stream_1"].format(
+                    f"https://t.me/{app.username}?start=info_{videoid}",
+                    title[:23],
+                    current.get("dur", "Unknown"),
+                    user,
+                ),
+                reply_markup=InlineKeyboardMarkup(
+                    button
+                ),
+            )
+
+            save_current_stream(
+                chat_id,
+                run,
+                "stream",
+            )
+
+        except Exception:
+            pass
 
         try:
             await mystic.delete()
@@ -330,10 +622,10 @@ async def skip(cli, message: Message, _, chat_id):
             pass
 
     # =======================================================
-    # TELEGRAM INDEX STREAM
+    # TELEGRAM INDEX
     # =======================================================
 
-    elif "index_" in queued:
+    elif queued and "index_" in queued:
 
         try:
 
@@ -349,16 +641,31 @@ async def skip(cli, message: Message, _, chat_id):
                 _["call_6"]
             )
 
-        button = stream_markup(_, chat_id)
-
-        run = await message.reply_photo(
-            photo=config.STREAM_IMG_URL,
-            caption=_["stream_2"].format(user),
-            reply_markup=InlineKeyboardMarkup(button),
+        button = stream_markup(
+            _,
+            chat_id,
         )
 
-        db[chat_id][0]["mystic"] = run
-        db[chat_id][0]["markup"] = "tg"
+        try:
+
+            run = await message.reply_photo(
+                photo=config.STREAM_IMG_URL,
+                caption=_["stream_2"].format(
+                    user
+                ),
+                reply_markup=InlineKeyboardMarkup(
+                    button
+                ),
+            )
+
+            save_current_stream(
+                chat_id,
+                run,
+                "tg",
+            )
+
+        except Exception:
+            pass
 
     # =======================================================
     # OTHER STREAM TYPES
@@ -366,11 +673,14 @@ async def skip(cli, message: Message, _, chat_id):
 
     else:
 
-        if videoid == "telegram":
+        # ---------------------------------------------------
+        # IMAGE
+        # ---------------------------------------------------
 
-            image = None
-
-        elif videoid == "soundcloud":
+        if videoid in (
+            "telegram",
+            "soundcloud",
+        ):
 
             image = None
 
@@ -387,6 +697,10 @@ async def skip(cli, message: Message, _, chat_id):
 
                 image = None
 
+        # ---------------------------------------------------
+        # START STREAM
+        # ---------------------------------------------------
+
         try:
 
             await Shivi.skip_stream(
@@ -402,31 +716,44 @@ async def skip(cli, message: Message, _, chat_id):
                 _["call_6"]
             )
 
+        button = stream_markup(
+            _,
+            chat_id,
+        )
+
         # ===================================================
         # TELEGRAM
         # ===================================================
 
         if videoid == "telegram":
 
-            button = stream_markup(_, chat_id)
+            try:
 
-            run = await message.reply_photo(
-                photo=(
-                    config.TELEGRAM_AUDIO_URL
-                    if str(streamtype) == "audio"
-                    else config.TELEGRAM_VIDEO_URL
-                ),
-                caption=_["stream_1"].format(
-                    config.SUPPORT_CHAT,
-                    title[:23],
-                    check[0]["dur"],
-                    user,
-                ),
-                reply_markup=InlineKeyboardMarkup(button),
-            )
+                run = await message.reply_photo(
+                    photo=(
+                        config.TELEGRAM_AUDIO_URL
+                        if str(streamtype) == "audio"
+                        else config.TELEGRAM_VIDEO_URL
+                    ),
+                    caption=_["stream_1"].format(
+                        config.SUPPORT_CHAT,
+                        title[:23],
+                        current.get("dur", "Unknown"),
+                        user,
+                    ),
+                    reply_markup=InlineKeyboardMarkup(
+                        button
+                    ),
+                )
 
-            db[chat_id][0]["mystic"] = run
-            db[chat_id][0]["markup"] = "tg"
+                save_current_stream(
+                    chat_id,
+                    run,
+                    "tg",
+                )
+
+            except Exception:
+                pass
 
         # ===================================================
         # SOUNDCLOUD
@@ -434,25 +761,33 @@ async def skip(cli, message: Message, _, chat_id):
 
         elif videoid == "soundcloud":
 
-            button = stream_markup(_, chat_id)
+            try:
 
-            run = await message.reply_photo(
-                photo=(
-                    config.SOUNCLOUD_IMG_URL
-                    if str(streamtype) == "audio"
-                    else config.TELEGRAM_VIDEO_URL
-                ),
-                caption=_["stream_1"].format(
-                    config.SUPPORT_CHAT,
-                    title[:23],
-                    check[0]["dur"],
-                    user,
-                ),
-                reply_markup=InlineKeyboardMarkup(button),
-            )
+                run = await message.reply_photo(
+                    photo=(
+                        config.SOUNDCLOUD_IMG_URL
+                        if str(streamtype) == "audio"
+                        else config.TELEGRAM_VIDEO_URL
+                    ),
+                    caption=_["stream_1"].format(
+                        config.SUPPORT_CHAT,
+                        title[:23],
+                        current.get("dur", "Unknown"),
+                        user,
+                    ),
+                    reply_markup=InlineKeyboardMarkup(
+                        button
+                    ),
+                )
 
-            db[chat_id][0]["mystic"] = run
-            db[chat_id][0]["markup"] = "tg"
+                save_current_stream(
+                    chat_id,
+                    run,
+                    "tg",
+                )
+
+            except Exception:
+                pass
 
         # ===================================================
         # YOUTUBE / OTHER
@@ -460,29 +795,43 @@ async def skip(cli, message: Message, _, chat_id):
 
         else:
 
-            button = stream_markup(_, chat_id)
+            try:
 
-            # button = stream_markup(_, chat_id, videoid)
+                img = await get_thumb(
+                    videoid
+                )
 
-            img = await get_thumb(videoid)
+            except Exception:
 
-            run = await message.reply_photo(
-                photo=img,
-                caption=_["stream_1"].format(
-                    f"https://t.me/{app.username}?start=info_{videoid}",
-                    title[:23],
-                    check[0]["dur"],
-                    user,
-                ),
-                reply_markup=InlineKeyboardMarkup(button),
-            )
+                img = config.STREAM_IMG_URL
 
-            db[chat_id][0]["mystic"] = run
-            db[chat_id][0]["markup"] = "stream"
+            try:
+
+                run = await message.reply_photo(
+                    photo=img,
+                    caption=_["stream_1"].format(
+                        f"https://t.me/{app.username}?start=info_{videoid}",
+                        title[:23],
+                        current.get("dur", "Unknown"),
+                        user,
+                    ),
+                    reply_markup=InlineKeyboardMarkup(
+                        button
+                    ),
+                )
+
+                save_current_stream(
+                    chat_id,
+                    run,
+                    "stream",
+                )
+
+            except Exception:
+                pass
 
 
 # ===========================================================
-# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 😎
+# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder)
 #
 # 🧑‍💻 Developer : t.me/TheSigmaCoder
 # 🔗 Source link : GitHub.com/Im-Notcoder/Shivi-V2
