@@ -1,15 +1,25 @@
-# =======================================================
+# ===========================================================
 # ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 🚀
+#
+# This source code is under MIT License 📜
+# ===========================================================
 
-# This source code is under MIT License 📜 Unauthorized forking, importing, or using this code without giving proper credit will result in legal action ⚠️
- 
-# 📩 DM for permission : @TheSigmaCoder
-# =======================================================
+import os
+import asyncio
+from logging import getLogger
 
-
-from ShiviMusic import app
+from motor.motor_asyncio import AsyncIOMotorClient
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
 from pyrogram import filters, enums
+from pyrogram.errors import (
+    FloodWait,
+    ChatSendPhotosForbidden,
+    ChatWriteForbidden,
+    MessageNotModified,
+    MessageIdInvalid,
+)
+
 from pyrogram.types import (
     ChatMemberUpdated,
     InlineKeyboardMarkup,
@@ -17,211 +27,785 @@ from pyrogram.types import (
     Message,
 )
 
-from PIL import Image, ImageDraw, ImageFont, ImageEnhance
-from motor.motor_asyncio import AsyncIOMotorClient
 from config import MONGO_DB_URI
+from ShiviMusic import app
 
-import asyncio
-from logging import getLogger
 
 LOGGER = getLogger(__name__)
 
+
+# ===========================================================
+# MONGODB
+# ===========================================================
+
 mongo = AsyncIOMotorClient(MONGO_DB_URI)
+
 db = mongo["Wel_DB"]
 welcomedb = db["welcome_toggle_system"]
 
+
+# ===========================================================
+# WELCOME DATABASE
+# ===========================================================
+
 async def get_welcome(chat_id: int):
-    data = await welcomedb.find_one({"chat_id": chat_id})
+
+    data = await welcomedb.find_one(
+        {"chat_id": chat_id}
+    )
+
     if not data:
         return True
-    return data.get("welcome", True)
+
+    return data.get(
+        "welcome",
+        True,
+    )
+
 
 async def enable_welcome(chat_id: int):
+
     await welcomedb.update_one(
         {"chat_id": chat_id},
-        {"$set": {"welcome": True}},
-        upsert=True
+        {
+            "$set": {
+                "welcome": True
+            }
+        },
+        upsert=True,
     )
 
+
 async def disable_welcome(chat_id: int):
+
     await welcomedb.update_one(
         {"chat_id": chat_id},
-        {"$set": {"welcome": False}},
-        upsert=True
+        {
+            "$set": {
+                "welcome": False
+            }
+        },
+        upsert=True,
     )
+
+
+# ===========================================================
+# TEMP STORAGE
+# ===========================================================
 
 class temp:
     MELCOW = {}
 
-def circle(pfp, size=(720, 720), brightness_factor=1.4):
-    pfp = pfp.resize(size).convert("RGBA")
-    pfp = ImageEnhance.Brightness(pfp).enhance(brightness_factor)
 
-    mask = Image.new("L", size, 0)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((0, 0, size[0], size[1]), fill=255)
+# ===========================================================
+# CREATE DOWNLOAD DIRECTORY
+# ===========================================================
 
-    pfp.putalpha(mask)
+os.makedirs(
+    "downloads",
+    exist_ok=True,
+)
+
+
+# ===========================================================
+# CIRCLE PROFILE PHOTO
+# ===========================================================
+
+def circle(
+    pfp,
+    size=(720, 720),
+    brightness_factor=1.4,
+):
+
+    pfp = pfp.resize(
+        size
+    ).convert(
+        "RGBA"
+    )
+
+    pfp = ImageEnhance.Brightness(
+        pfp
+    ).enhance(
+        brightness_factor
+    )
+
+    mask = Image.new(
+        "L",
+        size,
+        0,
+    )
+
+    draw = ImageDraw.Draw(
+        mask
+    )
+
+    draw.ellipse(
+        (
+            0,
+            0,
+            size[0],
+            size[1],
+        ),
+        fill=255,
+    )
+
+    pfp.putalpha(
+        mask
+    )
+
     return pfp
 
-def welcomepic(pic, user, chatname, id, uname, brightness_factor=1.3):
-    background = Image.open("ShiviMusic/assets/wel2.png").convert("RGBA")
 
-    pfp = Image.open(pic).convert("RGBA")
-    pfp = circle(pfp, size=(720, 720), brightness_factor=brightness_factor)
+# ===========================================================
+# WELCOME IMAGE
+# ===========================================================
 
-    background.paste(pfp, (520, 420), pfp)
+def welcomepic(
+    pic,
+    user,
+    chatname,
+    id,
+    uname,
+    brightness_factor=1.3,
+):
 
-    draw = ImageDraw.Draw(background)
+    background = Image.open(
+        "ShiviMusic/assets/wel2.png"
+    ).convert(
+        "RGBA"
+    )
 
-    font_path = "ShiviMusic/assets/font2.ttf"
+    pfp = Image.open(
+        pic
+    ).convert(
+        "RGBA"
+    )
 
-    font_id = ImageFont.truetype(font_path, 100)
-    font_username = ImageFont.truetype(font_path, 100)
+    pfp = circle(
+        pfp,
+        size=(720, 720),
+        brightness_factor=brightness_factor,
+    )
 
-    username_text = f"@{uname}" if uname else "Not Set"
+    background.paste(
+        pfp,
+        (520, 420),
+        pfp,
+    )
 
+    draw = ImageDraw.Draw(
+        background
+    )
 
-    draw.text((1920, 1340), str(id), font=font_id, fill="#ffffff")
-    draw.text((1920, 1480), username_text, font=font_username, fill="#ffffff")
+    font_path = (
+        "ShiviMusic/assets/font2.ttf"
+    )
 
-    output_path = f"downloads/welcome_{id}.png"
-    background.save(output_path)
+    font_id = ImageFont.truetype(
+        font_path,
+        100,
+    )
+
+    font_username = ImageFont.truetype(
+        font_path,
+        100,
+    )
+
+    username_text = (
+        f"@{uname}"
+        if uname
+        else "Not Set"
+    )
+
+    draw.text(
+        (1920, 1340),
+        str(id),
+        font=font_id,
+        fill="#ffffff",
+    )
+
+    draw.text(
+        (1920, 1480),
+        username_text,
+        font=font_username,
+        fill="#ffffff",
+    )
+
+    output_path = (
+        f"downloads/welcome_{id}.png"
+    )
+
+    background.save(
+        output_path
+    )
 
     return output_path
 
 
+# ===========================================================
+# ADMIN CHECK
+# ===========================================================
 
-@app.on_message(filters.command("welcome") & filters.group)
-async def welcome_cmd(_, message: Message):
+async def is_admin(
+    chat_id: int,
+    user_id: int,
+):
+
+    try:
+
+        member = await app.get_chat_member(
+            chat_id,
+            user_id,
+        )
+
+        return member.status in (
+            enums.ChatMemberStatus.ADMINISTRATOR,
+            enums.ChatMemberStatus.OWNER,
+        )
+
+    except Exception:
+
+        return False
+
+
+# ===========================================================
+# WELCOME COMMAND
+# ===========================================================
+
+@app.on_message(
+    filters.command(
+        "welcome"
+    )
+    & filters.group
+)
+async def welcome_cmd(
+    _,
+    message: Message,
+):
 
     chat = message.chat
     chat_id = chat.id
 
-    user = await app.get_chat_member(chat_id, message.from_user.id)
-    if user.status not in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER):
-        return await message.reply_text("**» ᴏɴʟʏ ᴀᴅᴍɪɴꜱ ᴄᴀɴ ʜᴀɴᴅʟᴇ ᴡᴇʟᴄᴏᴍᴇ ꜱʏꜱᴛᴇᴍ**")
+    if not await is_admin(
+        chat_id,
+        message.from_user.id,
+    ):
 
-    state = await get_welcome(chat_id)   
-    status = "ᴇɴᴀʙʟᴇᴅ" if state else "ᴅɪꜱᴀʙʟᴇᴅ"
+        return await message.reply_text(
+            "**» ᴏɴʟʏ ᴀᴅᴍɪɴꜱ ᴄᴀɴ ʜᴀɴᴅʟᴇ "
+            "ᴡᴇʟᴄᴏᴍᴇ ꜱʏꜱᴛᴇᴍ**"
+        )
 
-    btn = InlineKeyboardMarkup([
+    state = await get_welcome(
+        chat_id
+    )
+
+    status = (
+        "ᴇɴᴀʙʟᴇᴅ"
+        if state
+        else "ᴅɪꜱᴀʙʟᴇᴅ"
+    )
+
+    btn = InlineKeyboardMarkup(
         [
-            InlineKeyboardButton("ᴇɴᴀʙʟᴇ", callback_data=f"wlc_on_{chat_id}"),
-            InlineKeyboardButton("ᴅɪꜱᴀʙʟᴇ", callback_data=f"wlc_off_{chat_id}")
+            [
+                InlineKeyboardButton(
+                    "ᴇɴᴀʙʟᴇ",
+                    callback_data=f"wlc_on_{chat_id}",
+                ),
+                InlineKeyboardButton(
+                    "ᴅɪꜱᴀʙʟᴇ",
+                    callback_data=f"wlc_off_{chat_id}",
+                ),
+            ]
         ]
-    ])
+    )
 
     await message.reply_text(
-        f"» ᴄᴜʀʀᴇɴᴛʟʏ ᴡᴇʟᴄᴏᴍᴇ ꜱᴛᴀᴛᴜꜱ **{status}** ɪɴ **{chat.title}**",
-        reply_markup=btn
+        f"» ᴄᴜʀʀᴇɴᴛʟʏ ᴡᴇʟᴄᴏᴍᴇ ꜱᴛᴀᴛᴜꜱ "
+        f"**{status}** ɪɴ **{chat.title}**",
+        reply_markup=btn,
     )
 
-@app.on_callback_query(filters.regex("wlc_"))
-async def welcome_toggle(_, query):
 
-    data = query.data.split("_")
-    action = data[1]
-    chat_id = int(data[2])
+# ===========================================================
+# WELCOME TOGGLE
+# ===========================================================
 
-    member = await app.get_chat_member(chat_id, query.from_user.id)
-    if member.status not in (enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER):
-        return await query.answer("ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀᴅᴍɪɴ ʙᴀʙʏ 🥺", show_alert=True)
+@app.on_callback_query(
+    filters.regex(
+        r"^wlc_(on|off)_(-?\d+)$"
+    )
+)
+async def welcome_toggle(
+    _,
+    query,
+):
 
-    if action == "on":
-        await enable_welcome(chat_id)
-        new_status = "ᴇɴᴀʙʟᴇᴅ"
-    else:
-        await disable_welcome(chat_id)
-        new_status = "ᴅɪꜱᴀʙʟᴇᴅ"
+    try:
 
-    chat = await app.get_chat(chat_id)
+        data = query.data.split(
+            "_"
+        )
 
-    await query.message.edit_text(
-        f"» ᴡᴇʟᴄᴏᴍᴇ ᴍᴇꜱꜱᴀɢᴇ **{new_status}** ɪɴ **{chat.title}** ʙʏ :- **{query.from_user.mention}**"
+        action = data[1]
+        chat_id = int(data[2])
+
+    except Exception:
+
+        return await query.answer(
+            "ɪɴᴠᴀʟɪᴅ ʀᴇǫᴜᴇsᴛ.",
+            show_alert=True,
+        )
+
+    if not await is_admin(
+        chat_id,
+        query.from_user.id,
+    ):
+
+        return await query.answer(
+            "ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ ʙᴀʙʏ 🥺",
+            show_alert=True,
+        )
+
+    try:
+
+        if action == "on":
+
+            await enable_welcome(
+                chat_id
+            )
+
+            new_status = "ᴇɴᴀʙʟᴇᴅ"
+
+        else:
+
+            await disable_welcome(
+                chat_id
+            )
+
+            new_status = "ᴅɪꜱᴀʙʟᴇᴅ"
+
+        chat = await app.get_chat(
+            chat_id
+        )
+
+        text = (
+            f"» ᴡᴇʟᴄᴏᴍᴇ ᴍᴇꜱꜱᴀɢᴇ "
+            f"**{new_status}** "
+            f"ɪɴ **{chat.title}**\n\n"
+            f"ʙʏ :- {query.from_user.mention}"
+        )
+
+        try:
+
+            await query.message.edit_text(
+                text
+            )
+
+        except MessageNotModified:
+
+            pass
+
+        except MessageIdInvalid:
+
+            pass
+
+        await query.answer(
+            "ᴜᴘᴅᴀᴛᴇᴅ ✅"
+        )
+
+    except Exception as e:
+
+        LOGGER.exception(
+            "Welcome toggle error: %s",
+            e,
+        )
+
+        await query.answer(
+            "ᴇʀʀᴏʀ ᴡʜɪʟᴇ ᴜᴘᴅᴀᴛɪɴɢ.",
+            show_alert=True,
+        )
+
+
+# ===========================================================
+# SEND TEXT WELCOME
+# ===========================================================
+
+async def send_text_welcome(
+    chat_id,
+    user,
+    chat_title,
+):
+
+    username = (
+        f"@{user.username}"
+        if user.username
+        else "Not Set"
     )
 
-    await query.answer()
+    text = f"""
+**⏤͟͟͞͞★ ʜᴇʟʟᴏ ᴅᴇᴀʀ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ : {chat_title}**
+
+<u>**❖ ᴜsᴇʀ sʜᴏʀᴛ ɪɴғᴏ**</u>
+
+**➻ ɴᴀᴍᴇ »** {user.mention}
+**➻ ᴄʜᴀᴛ_ɪᴅ »** `{user.id}`
+**➻ ᴜ_ɴᴀᴍᴇ »** {username}
+
+**➻ ᴛʜᴀɴᴋs ғᴏʀ ᴊᴏɪɴɪɴɢ ᴜs ⚡️~!
+❅─────✧❅✦❅✧─────❅**
+"""
+
+    return await app.send_message(
+        chat_id,
+        text,
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                        url=(
+                            f"https://t.me/"
+                            f"{app.username}"
+                            f"?startgroup=true"
+                        ),
+                    )
+                ]
+            ]
+        ),
+    )
 
 
-@app.on_chat_member_updated(filters.group, group=-3)
-async def greet_new_member(_, member: ChatMemberUpdated):
+# ===========================================================
+# NEW MEMBER
+# ===========================================================
+
+@app.on_chat_member_updated(
+    filters.group,
+    group=-3,
+)
+async def greet_new_member(
+    _,
+    member: ChatMemberUpdated,
+):
 
     chat_id = member.chat.id
-    is_enabled = await get_welcome(chat_id)
+
+    # -------------------------------------------------------
+    # CHECK WELCOME STATUS
+    # -------------------------------------------------------
+
+    try:
+
+        is_enabled = await get_welcome(
+            chat_id
+        )
+
+    except Exception:
+
+        return
+
     if not is_enabled:
         return
 
-    user = member.new_chat_member.user if member.new_chat_member else None
+    # -------------------------------------------------------
+    # GET USER
+    # -------------------------------------------------------
+
+    user = (
+        member.new_chat_member.user
+        if member.new_chat_member
+        else None
+    )
+
     if not user:
         return
 
-    if member.new_chat_member and not member.old_chat_member and member.new_chat_member.status != "kicked":
+    # -------------------------------------------------------
+    # CHECK NEW MEMBER
+    # -------------------------------------------------------
+
+    if not (
+        member.new_chat_member
+        and member.new_chat_member.status
+        not in (
+            enums.ChatMemberStatus.KICKED,
+            enums.ChatMemberStatus.LEFT,
+        )
+        and (
+            not member.old_chat_member
+            or member.old_chat_member.status
+            in (
+                enums.ChatMemberStatus.LEFT,
+                enums.ChatMemberStatus.KICKED,
+            )
+        )
+    ):
+
+        return
+
+    # -------------------------------------------------------
+    # DELETE PREVIOUS WELCOME
+    # -------------------------------------------------------
+
+    old = temp.MELCOW.get(
+        f"welcome-{chat_id}"
+    )
+
+    if old:
 
         try:
-            pic = await app.download_media(
-                user.photo.big_file_id, file_name=f"pp{user.id}.png"
-            )
-        except:
-            pic = "ShiviMusic/assets/upic.png"
+            await old.delete()
+        except Exception:
+            pass
 
-        old = temp.MELCOW.get(f"welcome-{chat_id}")
-        if old:
-            try:
-                await old.delete()
-            except:
-                pass
+    # -------------------------------------------------------
+    # GET PROFILE PHOTO
+    # -------------------------------------------------------
+
+    pic = "ShiviMusic/assets/upic.png"
+
+    try:
+
+        if user.photo and user.photo.big_file_id:
+
+            downloaded = await app.download_media(
+                user.photo.big_file_id,
+                file_name=(
+                    f"downloads/pp{user.id}.png"
+                ),
+            )
+
+            if downloaded:
+                pic = downloaded
+
+    except Exception as e:
+
+        LOGGER.warning(
+            "Could not download profile photo: %s",
+            e,
+        )
+
+    # -------------------------------------------------------
+    # GENERATE WELCOME IMAGE
+    # -------------------------------------------------------
+
+    try:
 
         welcomeimg = welcomepic(
             pic,
             user.first_name,
             member.chat.title,
             user.id,
-            user.username
+            user.username,
         )
 
-        msg = await app.send_photo(
-            chat_id,
-            photo=welcomeimg,
-            caption=f"""
+    except Exception as e:
+
+        LOGGER.exception(
+            "Welcome image generation failed: %s",
+            e,
+        )
+
+        welcomeimg = None
+
+    # -------------------------------------------------------
+    # WELCOME TEXT
+    # -------------------------------------------------------
+
+    username = (
+        f"@{user.username}"
+        if user.username
+        else "Not Set"
+    )
+
+    caption = f"""
 **⏤͟͟͞͞★ ʜᴇʟʟᴏ ᴅᴇᴀʀ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ : {member.chat.title}**
 
 <u>**❖ ᴜsᴇʀ sʜᴏʀᴛ ɪɴғᴏ**</u>
 
 **➻ ɴᴀᴍᴇ »** {user.mention}
 **➻ ᴄʜᴀᴛ_ɪᴅ »** `{user.id}`
-**➻ ᴜ_ɴᴀᴍᴇ »** @{user.username}
+**➻ ᴜ_ɴᴀᴍᴇ »** {username}
 
 **➻ ᴛʜᴀɴᴋs ғᴏʀ ᴊᴏɪɴɪɴɢ ᴜs ⚡️~!
 ❅─────✧❅✦❅✧─────❅**
-""",
-            reply_markup=InlineKeyboardMarkup([
-                [
-                    InlineKeyboardButton(
-                        "ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-                        url=f"https://t.me/{app.username}?startgroup=true"
-                    )
-                ]
-            ])
+"""
+
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton(
+                    "ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                    url=(
+                        f"https://t.me/"
+                        f"{app.username}"
+                        f"?startgroup=true"
+                    ),
+                )
+            ]
+        ]
+    )
+
+    # -------------------------------------------------------
+    # SEND WELCOME
+    # -------------------------------------------------------
+
+    msg = None
+
+    if welcomeimg:
+
+        try:
+
+            msg = await app.send_photo(
+                chat_id,
+                photo=welcomeimg,
+                caption=caption,
+                reply_markup=keyboard,
+            )
+
+        except FloodWait as e:
+
+            LOGGER.warning(
+                "FloodWait while sending welcome: %s seconds",
+                e.value,
+            )
+
+            await asyncio.sleep(
+                e.value
+            )
+
+            try:
+
+                msg = await app.send_photo(
+                    chat_id,
+                    photo=welcomeimg,
+                    caption=caption,
+                    reply_markup=keyboard,
+                )
+
+            except Exception:
+
+                msg = None
+
+        except ChatSendPhotosForbidden:
+
+            LOGGER.warning(
+                "Photo sending forbidden in chat %s. "
+                "Using text welcome.",
+                chat_id,
+            )
+
+        except ChatWriteForbidden:
+
+            return
+
+        except Exception as e:
+
+            LOGGER.exception(
+                "Welcome photo failed: %s",
+                e,
+            )
+
+    # -------------------------------------------------------
+    # TEXT FALLBACK
+    # -------------------------------------------------------
+
+    if msg is None:
+
+        try:
+
+            msg = await app.send_message(
+                chat_id,
+                caption,
+                reply_markup=keyboard,
+            )
+
+        except FloodWait as e:
+
+            LOGGER.warning(
+                "FloodWait while sending text welcome: %s seconds",
+                e.value,
+            )
+
+            await asyncio.sleep(
+                e.value
+            )
+
+            try:
+
+                msg = await app.send_message(
+                    chat_id,
+                    caption,
+                    reply_markup=keyboard,
+                )
+
+            except Exception:
+
+                return
+
+        except ChatWriteForbidden:
+
+            return
+
+        except Exception as e:
+
+            LOGGER.exception(
+                "Text welcome failed: %s",
+                e,
+            )
+
+            return
+
+    # -------------------------------------------------------
+    # SAVE CURRENT WELCOME
+    # -------------------------------------------------------
+
+    temp.MELCOW[
+        f"welcome-{chat_id}"
+    ] = msg
+
+    # -------------------------------------------------------
+    # AUTO DELETE AFTER 10 SECONDS
+    # -------------------------------------------------------
+
+    async def delete_welcome():
+
+        await asyncio.sleep(
+            10
         )
 
-        async def delete_welcome():
-            await asyncio.sleep(10)
-            try:
-                await msg.delete()
-                if f"welcome-{chat_id}" in temp.MELCOW:
-                    del temp.MELCOW[f"welcome-{chat_id}"]
-            except:
-                pass
+        try:
 
-        asyncio.create_task(delete_welcome())
-        temp.MELCOW[f"welcome-{chat_id}"] = msg  
+            await msg.delete()
+
+        except Exception:
+
+            pass
+
+        finally:
+
+            if (
+                temp.MELCOW.get(
+                    f"welcome-{chat_id}"
+                )
+                == msg
+            ):
+
+                temp.MELCOW.pop(
+                    f"welcome-{chat_id}",
+                    None,
+                )
+
+    asyncio.create_task(
+        delete_welcome()
+    )
 
 
-# ======================================================
-# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder) 😎
-
+# ===========================================================
+# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder)
+#
 # 🧑‍💻 Developer : t.me/TheSigmaCoder
-# 🔗 Source link : GitHub.com/Im-Notcoder/Sonali-MusicV2
-# 📢 Telegram channel : t.me/Purvi_Bots
-# =======================================================
+# 🔗 Source link : t.me/Purvi_Bots
+# ===========================================================
