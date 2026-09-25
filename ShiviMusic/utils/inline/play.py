@@ -7,14 +7,11 @@ from ShiviMusic.utils.formatters import time_to_seconds
 
 
 # =========================================================
-# LINKS
+# SUPPORT & UPDATE LINKS
 # =========================================================
 
 SUPPORT_URL = "https://t.me/annu_support"
 UPDATE_URL = "https://t.me/annu_updates"
-
-# @ ke bina bot username
-BOT_USERNAME = "YourMusicBot"
 
 
 # =========================================================
@@ -120,21 +117,6 @@ def close_button():
 
 
 # =========================================================
-# ADD BOT BUTTON
-# =========================================================
-
-def add_bot_button():
-
-    return [
-        InlineKeyboardButton(
-            text="⊞ Aᴅᴅ Mᴇ Iɴ Yᴏᴜʀ Gʀᴏᴜᴘ ⊞",
-            url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-            style=SUCCESS,
-        )
-    ]
-
-
-# =========================================================
 # STREAM MARKUP TIMER
 # =========================================================
 
@@ -233,7 +215,7 @@ def stream_markup_timer(_, chat_id, played, dur):
         ],
 
         # =================================================
-        # FAVOURITE / AUTOPLAY
+        # FAV / AUTO
         # =================================================
 
         [
@@ -248,12 +230,6 @@ def stream_markup_timer(_, chat_id, played, dur):
                 style=DANGER,
             ),
         ],
-
-        # =================================================
-        # ADD BOT
-        # =================================================
-
-        add_bot_button(),
 
         # =================================================
         # CLOSE
@@ -343,12 +319,6 @@ def stream_markup(_, chat_id):
                 style=DANGER,
             ),
         ],
-
-        # =================================================
-        # ADD BOT
-        # =================================================
-
-        add_bot_button(),
 
         # =================================================
         # CLOSE
