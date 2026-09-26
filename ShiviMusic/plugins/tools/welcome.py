@@ -283,6 +283,9 @@ async def welcome_cmd(
     message: Message,
 ):
 
+    if not message.from_user:
+        return
+
     chat = message.chat
     chat_id = chat.id
 
@@ -314,7 +317,7 @@ async def welcome_cmd(
                     callback_data=f"wlc_on_{chat_id}",
                 ),
                 InlineKeyboardButton(
-                    "ᴅɪꜱᴀʙʟᴇ",
+                    "ᴅɪsᴀʙʟᴇ",
                     callback_data=f"wlc_off_{chat_id}",
                 ),
             ]
@@ -403,11 +406,10 @@ async def welcome_toggle(
                 text
             )
 
-        except MessageNotModified:
-
-            pass
-
-        except MessageIdInvalid:
+        except (
+            MessageNotModified,
+            MessageIdInvalid,
+        ):
 
             pass
 
@@ -502,7 +504,12 @@ async def greet_new_member(
             chat_id
         )
 
-    except Exception:
+    except Exception as e:
+
+        LOGGER.warning(
+            "Could not read welcome status: %s",
+            e,
+        )
 
         return
 
@@ -510,40 +517,49 @@ async def greet_new_member(
         return
 
     # -------------------------------------------------------
-    # GET USER
+    # GET NEW USER
     # -------------------------------------------------------
 
-    user = (
-        member.new_chat_member.user
-        if member.new_chat_member
-        else None
-    )
+    if not member.new_chat_member:
+        return
+
+    user = member.new_chat_member.user
 
     if not user:
         return
 
     # -------------------------------------------------------
     # CHECK NEW MEMBER
+    # IMPORTANT:
+    # Pyrogram uses BANNED, not KICKED.
     # -------------------------------------------------------
 
-    if not (
-        member.new_chat_member
-        and member.new_chat_member.status
-        not in (
-            enums.ChatMemberStatus.KICKED,
-            enums.ChatMemberStatus.LEFT,
-        )
-        and (
-            not member.old_chat_member
-            or member.old_chat_member.status
-            in (
-                enums.ChatMemberStatus.LEFT,
-                enums.ChatMemberStatus.KICKED,
-            )
-        )
-    ):
+    new_status = member.new_chat_member.status
 
+    # User must currently be a member/restricted member.
+    if new_status not in (
+        enums.ChatMemberStatus.MEMBER,
+        enums.ChatMemberStatus.RESTRICTED,
+    ):
         return
+
+    # -------------------------------------------------------
+    # CHECK OLD STATUS
+    # -------------------------------------------------------
+
+    old_member = member.old_chat_member
+
+    if old_member:
+
+        old_status = old_member.status
+
+        # Don't welcome users whose status was already
+        # an active member/admin/restricted member.
+        if old_status not in (
+            enums.ChatMemberStatus.LEFT,
+            enums.ChatMemberStatus.BANNED,
+        ):
+            return
 
     # -------------------------------------------------------
     # DELETE PREVIOUS WELCOME
@@ -591,6 +607,8 @@ async def greet_new_member(
     # GENERATE WELCOME IMAGE
     # -------------------------------------------------------
 
+    welcomeimg = None
+
     try:
 
         welcomeimg = welcomepic(
@@ -607,8 +625,6 @@ async def greet_new_member(
             "Welcome image generation failed: %s",
             e,
         )
-
-        welcomeimg = None
 
     # -------------------------------------------------------
     # WELCOME TEXT
@@ -633,20 +649,38 @@ async def greet_new_member(
 ❅─────✧❅✦❅✧─────❅**
 """
 
-    keyboard = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
-                    url=(
-                        f"https://t.me/"
-                        f"{app.username}"
-                        f"?startgroup=true"
-                    ),
-                )
-            ]
-        ]
+    # -------------------------------------------------------
+    # BOT GROUP LINK
+    # -------------------------------------------------------
+
+    bot_username = getattr(
+        app,
+        "username",
+        None,
     )
+
+    if bot_username:
+
+        bot_url = (
+            f"https://t.me/"
+            f"{bot_username}"
+            f"?startgroup=true"
+        )
+
+        keyboard = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                        "ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ",
+                        url=bot_url,
+                    )
+                ]
+            ]
+        )
+
+    else:
+
+        keyboard = None
 
     # -------------------------------------------------------
     # SEND WELCOME
@@ -685,7 +719,12 @@ async def greet_new_member(
                     reply_markup=keyboard,
                 )
 
-            except Exception:
+            except Exception as e:
+
+                LOGGER.warning(
+                    "Retry welcome photo failed: %s",
+                    e,
+                )
 
                 msg = None
 
@@ -741,7 +780,12 @@ async def greet_new_member(
                     reply_markup=keyboard,
                 )
 
-            except Exception:
+            except Exception as e:
+
+                LOGGER.warning(
+                    "Retry text welcome failed: %s",
+                    e,
+                )
 
                 return
 
