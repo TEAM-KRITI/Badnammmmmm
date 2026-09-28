@@ -12,6 +12,7 @@ from pyrogram.types import (
     InlineKeyboardMarkup,
     Message,
 )
+
 from py_yt import VideosSearch
 
 import config
@@ -41,74 +42,155 @@ from config import BANNED_USERS
 from strings import get_string
 
 
-# =========================================================
-# START / WELCOME IMAGES
-# =========================================================
+# =======================================================
+# START / WELCOME PICTURES
+# =======================================================
 
 shivi_PIC = [
-    "https://files.catbox.moe/4ojtc4.jpg",
-    "https://files.catbox.moe/30wg78.jpg",
     "https://files.catbox.moe/4ojtc4.jpg",
     "https://files.catbox.moe/30wg78.jpg",
 ]
 
 
-# =========================================================
+# =======================================================
+# SAFE URL FUNCTION
+# =======================================================
+
+def safe_url(value, fallback=None):
+    """
+    Telegram InlineKeyboardButton requires a valid URL.
+    This function converts @username / t.me links safely.
+    """
+
+    if not value:
+        return fallback
+
+    value = str(value).strip()
+
+    if value.startswith("https://"):
+        return value
+
+    if value.startswith("http://"):
+        return value.replace(
+            "http://",
+            "https://",
+            1,
+        )
+
+    if value.startswith("@"):
+        return f"https://t.me/{value[1:]}"
+
+    if value.startswith("t.me/"):
+        return f"https://{value}"
+
+    return f"https://t.me/{value}"
+
+
+# =======================================================
 # PRIVATE GROUP JOIN REQUEST
-# =========================================================
+# =======================================================
+#
+# User sends JOIN REQUEST
+#          ↓
+# Bot receives request
+#          ↓
+# Bot gets its own username
+#          ↓
+# Bot sends automatic DM
+#
+# =======================================================
 
 @app.on_chat_join_request()
-async def join_request_welcome(client, request):
+async def private_join_request(client, request):
 
     try:
+
         user = request.from_user
         chat = request.chat
 
         if not user:
+            print(
+                "[JOIN REQUEST] User information not found."
+            )
             return
 
-        # -------------------------------------------------
-        # CURRENT BOT DETAILS
-        # -------------------------------------------------
+        # =================================================
+        # GET CURRENT BOT
+        # =================================================
 
         me = await client.get_me()
 
-        bot_name = me.first_name or "ᴍᴜsɪᴄ ʙᴏᴛ"
+        bot_name = (
+            me.first_name
+            or "ᴍᴜsɪᴄ ʙᴏᴛ"
+        )
+
         bot_username = me.username
 
         if bot_username:
+
             bot_display = f"@{bot_username}"
-            bot_url = f"https://t.me/{bot_username}"
+
+            bot_url = (
+                f"https://t.me/{bot_username}"
+            )
+
         else:
+
             bot_display = bot_name
-            bot_url = config.SUPPORT_CHAT
 
-        # -------------------------------------------------
+            bot_url = safe_url(
+                getattr(
+                    config,
+                    "SUPPORT_CHAT",
+                    None,
+                ),
+                "https://t.me/",
+            )
+
+        # =================================================
         # USER / GROUP
-        # -------------------------------------------------
+        # =================================================
 
-        user_name = user.first_name or "ᴜsᴇʀ"
-        group_name = chat.title or "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
-
-        # -------------------------------------------------
-        # UPDATE / SUPPORT
-        # -------------------------------------------------
-
-        update_url = getattr(
-            config,
-            "UPDATE_CHAT",
-            config.SUPPORT_CHAT,
+        user_name = (
+            user.first_name
+            or "ᴜsᴇʀ"
         )
 
-        support_url = getattr(
-            config,
-            "SUPPORT_CHAT",
-            update_url,
+        group_name = (
+            chat.title
+            or "ᴘʀɪᴠᴀᴛᴇ ɢʀᴏᴜᴘ"
         )
 
-        # -------------------------------------------------
-        # ADVANCED FONT + BOLD MESSAGE
-        # -------------------------------------------------
+        # =================================================
+        # UPDATE
+        # =================================================
+
+        update_url = safe_url(
+            getattr(
+                config,
+                "UPDATE_CHAT",
+                None,
+            ),
+            bot_url,
+        )
+
+        # =================================================
+        # SUPPORT
+        # =================================================
+
+        support_url = safe_url(
+            getattr(
+                config,
+                "SUPPORT_CHAT",
+                None,
+            ),
+            bot_url,
+        )
+
+        # =================================================
+        # ADVANCED FONT + BOLD
+        # =================================================
 
         welcome_text = f"""
 <b>ᴡᴇʟᴄᴏᴍᴇ, {user_name}!</b>
@@ -124,9 +206,9 @@ async def join_request_welcome(client, request):
 <b>ᴜsᴇ /sᴛᴀʀᴛ ᴛᴏ ʙᴇɢɪɴ.</b>
 """
 
-        # -------------------------------------------------
+        # =================================================
         # BUTTONS
-        # -------------------------------------------------
+        # =================================================
 
         buttons = InlineKeyboardMarkup(
             [
@@ -149,21 +231,21 @@ async def join_request_welcome(client, request):
             ]
         )
 
-        # -------------------------------------------------
-        # SEND MESSAGE
-        # -------------------------------------------------
+        # =================================================
+        # SEND AUTOMATIC MESSAGE
+        # =================================================
 
         await client.send_photo(
             chat_id=request.user_chat_id,
             photo=random.choice(shivi_PIC),
             caption=welcome_text,
-            reply_markup=buttons,
             parse_mode=ParseMode.HTML,
+            reply_markup=buttons,
         )
 
-        # -------------------------------------------------
-        # LOGGER
-        # -------------------------------------------------
+        # =================================================
+        # LOG
+        # =================================================
 
         if await is_on_off(2):
 
@@ -177,13 +259,20 @@ async def join_request_welcome(client, request):
 <b>✦ ɴᴇᴡ ᴊᴏɪɴ ʀᴇǫᴜᴇsᴛ</b>
 
 <b>✦ ᴜsᴇʀ ➜</b> {user.mention}
-<b>✦ ᴜsᴇʀ ɪᴅ ➜</b> <code>{user.id}</code>
-<b>✦ ᴜsᴇʀɴᴀᴍᴇ ➜</b> {username}
 
-<b>✦ ɢʀᴏᴜᴘ ➜</b> {group_name}
-<b>✦ ᴄʜᴀᴛ ɪᴅ ➜</b> <code>{chat.id}</code>
+<b>✦ ᴜsᴇʀ ɪᴅ ➜</b>
+<code>{user.id}</code>
 
-<b>✦ ᴡᴇʟᴄᴏᴍᴇ ᴍᴇssᴀɢᴇ sᴇɴᴛ ✓</b>
+<b>✦ ᴜsᴇʀɴᴀᴍᴇ ➜</b>
+{username}
+
+<b>✦ ɢʀᴏᴜᴘ ➜</b>
+{group_name}
+
+<b>✦ ɢʀᴏᴜᴘ ɪᴅ ➜</b>
+<code>{chat.id}</code>
+
+<b>✦ ᴡᴇʟᴄᴏᴍᴇ sᴇɴᴛ ✓</b>
 """
 
             await client.send_message(
@@ -192,19 +281,26 @@ async def join_request_welcome(client, request):
                 parse_mode=ParseMode.HTML,
             )
 
+        print(
+            f"[JOIN REQUEST] SUCCESS | "
+            f"USER={user.id} | "
+            f"GROUP={chat.id}"
+        )
+
     except Exception as ex:
 
         print(
-            f"[ᴊᴏɪɴ ʀᴇǫᴜᴇsᴛ ᴇʀʀᴏʀ] {ex}"
+            f"[JOIN REQUEST] ERROR: "
+            f"{type(ex).__name__}: {ex}"
         )
 
 
-# =========================================================
+# =======================================================
 # PRIVATE /START
-# =========================================================
+# =======================================================
 
 @app.on_message(
-    filters.command(["start"])
+    filters.command("start")
     & filters.private
     & ~BANNED_USERS
 )
@@ -220,22 +316,22 @@ async def start_pm(client, message: Message, _):
     except Exception:
         pass
 
-    # =====================================================
+    # ===================================================
     # START PARAMETER
-    # =====================================================
+    # ===================================================
 
     if len(message.text.split()) > 1:
 
         name = message.text.split(
             None,
-            1
+            1,
         )[1]
 
         # -------------------------------------------------
         # HELP
         # -------------------------------------------------
 
-        if name[0:4] == "help":
+        if name.startswith("help"):
 
             keyboard = help_pannel(_)
 
@@ -251,7 +347,7 @@ async def start_pm(client, message: Message, _):
         # SUDO
         # -------------------------------------------------
 
-        if name[0:3] == "sud":
+        if name.startswith("sud"):
 
             await sudoers_list(
                 client=client,
@@ -267,12 +363,13 @@ async def start_pm(client, message: Message, _):
                     else "ɴᴏ ᴜsᴇʀɴᴀᴍᴇ"
                 )
 
-                return await app.send_message(
+                await app.send_message(
                     chat_id=config.LOGGER_ID,
                     text=f"""
-✦ {message.from_user.mention}
-ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ
-<b>sᴜᴅᴏʟɪsᴛ</b>.
+<b>✦ sᴜᴅᴏʟɪsᴛ ᴄʜᴇᴄᴋ</b>
+
+<b>✦ ᴜsᴇʀ ➜</b>
+{message.from_user.mention}
 
 <b>✦ ᴜsᴇʀ ɪᴅ ➜</b>
 <code>{message.from_user.id}</code>
@@ -286,31 +383,42 @@ async def start_pm(client, message: Message, _):
             return
 
         # -------------------------------------------------
-        # TRACK INFO
+        # INFO
         # -------------------------------------------------
 
-        if name[0:3] == "inf":
+        if name.startswith("inf"):
 
-            m = await message.reply_text("🔎")
+            m = await message.reply_text(
+                "🔎"
+            )
 
-            query = str(name).replace(
+            query = name.replace(
                 "info_",
                 "",
                 1,
             )
 
             query = (
-                f"https://www.youtube.com/watch?v={query}"
+                "https://www.youtube.com/watch?v="
+                + query
             )
 
-            results = VideosSearch(
-                query,
-                limit=1,
-            )
+            try:
 
-            data = await results.next()
+                results = VideosSearch(
+                    query,
+                    limit=1,
+                )
 
-            for result in data["result"]:
+                data = await results.next()
+
+                if not data.get("result"):
+                    await m.edit_text(
+                        "❌ ᴛʀᴀᴄᴋ ɴᴏᴛ ғᴏᴜɴᴅ."
+                    )
+                    return
+
+                result = data["result"][0]
 
                 title = result["title"]
                 duration = result["duration"]
@@ -330,118 +438,109 @@ async def start_pm(client, message: Message, _):
                 )
 
                 link = result["link"]
-                published = result["publishedTime"]
 
-            searched_text = _[
-                "start_6"
-            ].format(
-                title,
-                duration,
-                views,
-                published,
-                channellink,
-                channel,
-                app.mention,
-            )
-
-            key = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            text=_["S_B_8"],
-                            url=link,
-                        ),
-                        InlineKeyboardButton(
-                            text=_["S_B_9"],
-                            url=config.SUPPORT_CHAT,
-                        ),
-                    ],
-                ]
-            )
-
-            try:
-                await m.delete()
-            except Exception:
-                pass
-
-            await app.send_photo(
-                chat_id=message.chat.id,
-                photo=thumbnail,
-                caption=searched_text,
-                reply_markup=key,
-            )
-
-            if await is_on_off(2):
-
-                username = (
-                    f"@{message.from_user.username}"
-                    if message.from_user.username
-                    else "ɴᴏ ᴜsᴇʀɴᴀᴍᴇ"
+                published = (
+                    result["publishedTime"]
                 )
 
-                return await app.send_message(
-                    chat_id=config.LOGGER_ID,
-                    text=f"""
-✦ {message.from_user.mention}
-ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ
-<b>ᴛʀᴀᴄᴋ ɪɴғᴏʀᴍᴀᴛɪᴏɴ</b>.
+                searched_text = _[
+                    "start_6"
+                ].format(
+                    title,
+                    duration,
+                    views,
+                    published,
+                    channellink,
+                    channel,
+                    app.mention,
+                )
 
-✦ <b>ᴜsᴇʀ ɪᴅ ➜</b>
-<code>{message.from_user.id}</code>
+                key = InlineKeyboardMarkup(
+                    [
+                        [
+                            InlineKeyboardButton(
+                                text=_["S_B_8"],
+                                url=link,
+                            ),
+                            InlineKeyboardButton(
+                                text=_["S_B_9"],
+                                url=config.SUPPORT_CHAT,
+                            ),
+                        ],
+                    ]
+                )
 
-✦ <b>ᴜsᴇʀɴᴀᴍᴇ ➜</b>
-{username}
-""",
+                await m.delete()
+
+                await app.send_photo(
+                    chat_id=message.chat.id,
+                    photo=thumbnail,
+                    caption=searched_text,
+                    reply_markup=key,
+                )
+
+            except Exception as ex:
+
+                await m.edit_text(
+                    f"❌ <b>ᴇʀʀᴏʀ:</b> <code>{ex}</code>",
                     parse_mode=ParseMode.HTML,
                 )
 
-    # =====================================================
-    # NORMAL START
-    # =====================================================
+            return
 
-    else:
+    # ===================================================
+    # NORMAL PRIVATE START
+    # ===================================================
 
-        out = private_panel(_)
+    out = private_panel(_)
 
-        await message.reply_photo(
-            random.choice(shivi_PIC),
-            caption=_["start_2"].format(
-                message.from_user.mention,
-                app.mention,
-            ),
-            reply_markup=InlineKeyboardMarkup(out),
+    await message.reply_photo(
+        random.choice(shivi_PIC),
+        caption=_["start_2"].format(
+            message.from_user.mention,
+            app.mention,
+        ),
+        reply_markup=InlineKeyboardMarkup(
+            out
+        ),
+    )
+
+    # ===================================================
+    # LOGGER
+    # ===================================================
+
+    if await is_on_off(2):
+
+        username = (
+            f"@{message.from_user.username}"
+            if message.from_user.username
+            else "ɴᴏ ᴜsᴇʀɴᴀᴍᴇ"
         )
 
-        if await is_on_off(2):
+        await app.send_message(
+            chat_id=config.LOGGER_ID,
+            text=f"""
+<b>✦ ʙᴏᴛ sᴛᴀʀᴛᴇᴅ</b>
 
-            username = (
-                f"@{message.from_user.username}"
-                if message.from_user.username
-                else "ɴᴏ ᴜsᴇʀɴᴀᴍᴇ"
-            )
-
-            return await app.send_message(
-                chat_id=config.LOGGER_ID,
-                text=f"""
+<b>✦ ᴜsᴇʀ ➜</b>
 {message.from_user.mention}
-ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.
 
-<b>ᴜsᴇʀ ɪᴅ ➜</b>
+<b>✦ ᴜsᴇʀ ɪᴅ ➜</b>
 <code>{message.from_user.id}</code>
 
-<b>ᴜsᴇʀɴᴀᴍᴇ ➜</b>
+<b>✦ ᴜsᴇʀɴᴀᴍᴇ ➜</b>
 {username}
 """,
-                parse_mode=ParseMode.HTML,
-            )
+            parse_mode=ParseMode.HTML,
+        )
 
 
-# =========================================================
+# =======================================================
 # GROUP /START
-# =========================================================
+# =======================================================
 
 @app.on_message(
-    filters.command(["start"])
+    filters.command("start")
     & filters.group
     & ~BANNED_USERS
 )
@@ -460,17 +559,19 @@ async def start_gp(client, message: Message, _):
             app.mention,
             get_readable_time(uptime),
         ),
-        reply_markup=InlineKeyboardMarkup(out),
+        reply_markup=InlineKeyboardMarkup(
+            out
+        ),
     )
 
-    return await add_served_chat(
+    await add_served_chat(
         message.chat.id
     )
 
 
-# =========================================================
-# NEW CHAT MEMBER
-# =========================================================
+# =======================================================
+# BOT ADDED / NEW MEMBERS
+# =======================================================
 
 @app.on_message(
     filters.new_chat_members,
@@ -488,24 +589,32 @@ async def welcome(client, message: Message):
 
             _ = get_string(language)
 
-            # -------------------------------------------------
+            # ------------------------------------------------
             # BANNED USER
-            # -------------------------------------------------
+            # ------------------------------------------------
 
-            if await is_banned_user(member.id):
+            if await is_banned_user(
+                member.id
+            ):
 
                 try:
+
                     await message.chat.ban_member(
                         member.id
                     )
+
                 except Exception:
                     pass
 
-            # -------------------------------------------------
-            # BOT ADDED
-            # -------------------------------------------------
+            # ------------------------------------------------
+            # BOT ITSELF ADDED
+            # ------------------------------------------------
 
             if member.id == app.id:
+
+                # --------------------------------------------
+                # SUPERGROUP ONLY
+                # --------------------------------------------
 
                 if (
                     message.chat.type
@@ -520,9 +629,9 @@ async def welcome(client, message: Message):
                         message.chat.id
                     )
 
-                # -------------------------------------------------
-                # BLACKLISTED GROUP
-                # -------------------------------------------------
+                # --------------------------------------------
+                # BLACKLIST
+                # --------------------------------------------
 
                 if (
                     message.chat.id
@@ -546,9 +655,9 @@ async def welcome(client, message: Message):
                         message.chat.id
                     )
 
-                # -------------------------------------------------
+                # --------------------------------------------
                 # GROUP WELCOME
-                # -------------------------------------------------
+                # --------------------------------------------
 
                 out = start_panel(_)
 
@@ -573,14 +682,10 @@ async def welcome(client, message: Message):
         except Exception as ex:
 
             print(
-                f"[ɴᴇᴡ ᴍᴇᴍʙᴇʀ ᴇʀʀᴏʀ] {ex}"
+                f"[NEW MEMBER ERROR] {ex}"
             )
 
 
 # =======================================================
-# ©️ 2025-26 All Rights Reserved by Purvi Bots (Im-Notcoder)
-#
-# 🧑‍💻 Developer : t.me/TheSigmaCoder
-# 🔗 Source : GitHub.com/Im-Notcoder/Purvi-V3
-# 📢 Telegram : t.me/Purvi_Bots
+# END
 # =======================================================
