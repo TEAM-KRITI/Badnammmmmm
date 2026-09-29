@@ -1,48 +1,41 @@
 # ============================================================
 # 🎧 ᴠɪᴅᴇᴏ ᴄʜᴀᴛ sʏsᴛᴇᴍ
-# ShiviMusic
 # ============================================================
 
 from pyrogram import filters
 from pyrogram.types import (
-    Message,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
-    CallbackQuery,
 )
 
 from ShiviMusic import app
 
 
 # ============================================================
-# 🤖 ʙᴏᴛ ᴜsᴇʀɴᴀᴍᴇ
+# 🔘 ʙᴜᴛᴛᴏɴs
 # ============================================================
 
-async def get_bot_username():
-    me = await app.get_me()
-    return me.username
+async def get_buttons(client):
 
+    me = await client.get_me()
 
-# ============================================================
-# 🔘 ᴠᴄ ʙᴜᴛᴛᴏɴs
-# ============================================================
+    username = me.username
 
-async def vc_buttons():
-
-    username = await get_bot_username()
-
-    add_link = f"https://t.me/{username}?startgroup=true"
+    if username:
+        add_url = f"https://t.me/{username}?startgroup=true"
+    else:
+        add_url = "https://t.me/"
 
     return InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
                     "✙ ᴧᴅᴅ ᴍᴇ ✙",
-                    url=add_link,
+                    url=add_url,
                 ),
                 InlineKeyboardButton(
-                    " ᴄʟᴏsᴇ ",
-                    callback_data="vc_close",
+                    "≡ ᴄʟᴏsᴇ ≡",
+                    callback_data="close_vc_message",
                 ),
             ]
         ]
@@ -50,14 +43,13 @@ async def vc_buttons():
 
 
 # ============================================================
-# 🟢 ᴠɪᴅᴇᴏ ᴄʜᴀᴛ sᴛᴀʀᴛᴇᴅ
+# 🟢 ᴠᴄ sᴛᴀʀᴛᴇᴅ
 # ============================================================
 
 @app.on_message(filters.video_chat_started)
-async def vc_started(client, message: Message):
+async def video_chat_started(client, message):
 
     try:
-
         chat_name = message.chat.title or "ᴛʜɪs ɢʀᴏᴜᴘ"
 
         text = (
@@ -65,7 +57,7 @@ async def vc_started(client, message: Message):
             f"**▶ /play [sᴏɴɢ_ɴᴀᴍᴇ] ᴇɴᴊᴏʏ ᴍᴜsɪᴄ 🎶**"
         )
 
-        buttons = await vc_buttons()
+        buttons = await get_buttons(client)
 
         await message.reply_text(
             text,
@@ -74,77 +66,47 @@ async def vc_started(client, message: Message):
         )
 
     except Exception as e:
-        print(f"VC START ERROR: {e}")
+        print(f"VIDEO CHAT START ERROR: {e}")
 
 
 # ============================================================
-# 🔴 ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ᴇɴᴅᴇᴅ
+# 🔴 ᴠᴄ ᴇɴᴅᴇᴅ
 # ============================================================
 
 @app.on_message(filters.video_chat_ended)
-async def vc_ended(client, message: Message):
+async def video_chat_ended(client, message):
 
     try:
-
         chat_name = message.chat.title or "ᴛʜɪs ɢʀᴏᴜᴘ"
 
-        duration_text = ""
+        duration = 0
 
-        # ----------------------------------------------------
-        # ⏱ ᴠᴄ ᴅᴜʀᴀᴛɪᴏɴ
-        # ----------------------------------------------------
+        if message.video_chat_ended:
+            duration = message.video_chat_ended.duration or 0
 
-        try:
+        days = duration // 86400
+        hours = (duration % 86400) // 3600
+        minutes = (duration % 3600) // 60
 
-            ended = message.video_chat_ended
+        if days > 0:
+            duration_text = f"{days}ᴅ {hours}ʜ"
 
-            if ended and ended.duration:
+        elif hours > 0:
+            duration_text = f"{hours}ʜ {minutes}ᴍ"
 
-                total_seconds = ended.duration
+        elif minutes > 0:
+            duration_text = f"{minutes}ᴍ"
 
-                days = total_seconds // 86400
-                remaining = total_seconds % 86400
-
-                hours = remaining // 3600
-                remaining %= 3600
-
-                minutes = remaining // 60
-                seconds = remaining % 60
-
-                if days:
-                    duration_text = (
-                        f"\n\n**⏰ ᴅᴜʀᴀᴛɪᴏɴ: "
-                        f"{days}ᴅ {hours}ʜ**"
-                    )
-
-                elif hours:
-                    duration_text = (
-                        f"\n\n**⏰ ᴅᴜʀᴀᴛɪᴏɴ: "
-                        f"{hours}ʜ {minutes}ᴍ**"
-                    )
-
-                elif minutes:
-                    duration_text = (
-                        f"\n\n**⏰ ᴅᴜʀᴀᴛɪᴏɴ: "
-                        f"{minutes}ᴍ {seconds}s**"
-                    )
-
-                else:
-                    duration_text = (
-                        f"\n\n**⏰ ᴅᴜʀᴀᴛɪᴏɴ: "
-                        f"{seconds}s**"
-                    )
-
-        except Exception:
-            duration_text = ""
+        else:
+            duration_text = f"{duration}s"
 
         text = (
-            f"**❖ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ᴇɴᴅᴇᴅ ɪɴ {chat_name}**"
-            f"{duration_text}\n\n"
+            f"**❖ ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ᴇɴᴅᴇᴅ ɪɴ {chat_name}**\n\n"
+            f"**⏰ ᴅᴜʀᴀᴛɪᴏɴ: {duration_text}**\n\n"
             f"**◆ ᴄʟᴇᴀʀᴇᴅ ᴀʟʟ Qᴜᴇᴜᴇ sᴏɴɢs 🗑**"
         )
 
-        buttons = await vc_buttons()
+        buttons = await get_buttons(client)
 
         await message.reply_text(
             text,
@@ -153,32 +115,28 @@ async def vc_ended(client, message: Message):
         )
 
     except Exception as e:
-        print(f"VC END ERROR: {e}")
+        print(f"VIDEO CHAT END ERROR: {e}")
 
 
 # ============================================================
-# 👥 ᴠɪᴅᴇᴏ ᴄʜᴀᴛ ᴍᴇᴍʙᴇʀs ɪɴᴠɪᴛᴇᴅ
+# 👥 ᴠᴄ ᴍᴇᴍʙᴇʀs ɪɴᴠɪᴛᴇᴅ
 # ============================================================
 
 @app.on_message(filters.video_chat_members_invited)
-async def vc_members_invited(client, message: Message):
+async def video_chat_members_invited(client, message):
 
     try:
 
         if not message.from_user:
             return
 
-        invited = message.video_chat_members_invited
-
-        if not invited:
+        if not message.video_chat_members_invited:
             return
 
-        if not invited.users:
-            return
+        users = message.video_chat_members_invited.users
 
-        # ----------------------------------------------------
-        # 👤 ɪɴᴠɪᴛᴇʀ
-        # ----------------------------------------------------
+        if not users:
+            return
 
         inviter_name = message.from_user.first_name or "ᴜsᴇʀ"
 
@@ -186,32 +144,24 @@ async def vc_members_invited(client, message: Message):
             f"[{inviter_name}](tg://user?id={message.from_user.id})"
         )
 
-        # ----------------------------------------------------
-        # 👥 ɪɴᴠɪᴛᴇᴅ ᴜsᴇʀs
-        # ----------------------------------------------------
+        invited_users = []
 
-        invited_list = []
+        for user in users:
 
-        for user in invited.users:
+            name = user.first_name or "ᴜsᴇʀ"
 
-            if not user.first_name:
-                continue
-
-            invited_list.append(
-                f"[{user.first_name}](tg://user?id={user.id})"
+            invited_users.append(
+                f"[{name}](tg://user?id={user.id})"
             )
 
-        if not invited_list:
-            return
-
-        names = ", ".join(invited_list)
+        names = ", ".join(invited_users)
 
         text = (
             f"**❖ {inviter} ɪɴᴠɪᴛᴇᴅ {names} ᴏɴ ᴠᴄ ⚡**\n\n"
             f"**⏤͟͟͞͞★ ᴊᴏɪɴ ғᴀsᴛ & ᴇɴᴊᴏʏ ᴍᴜsɪᴄ 🎧**"
         )
 
-        buttons = await vc_buttons()
+        buttons = await get_buttons(client)
 
         await message.reply_text(
             text,
@@ -220,20 +170,22 @@ async def vc_members_invited(client, message: Message):
         )
 
     except Exception as e:
-        print(f"VC INVITE ERROR: {e}")
+        print(f"VIDEO CHAT INVITE ERROR: {e}")
 
 
 # ============================================================
-# ❌ ᴄʟᴏsᴇ ʙᴜᴛᴛᴏɴ
+# ❌ ᴄʟᴏsᴇ
 # ============================================================
 
-@app.on_callback_query(filters.regex(r"^vc_close$"))
-async def vc_close_callback(client, query: CallbackQuery):
+@app.on_callback_query(
+    filters.regex("^close_vc_message$")
+)
+async def close_vc_message(client, query):
 
     try:
 
         await query.answer(
-            "ᴍᴇssᴀɢᴇ ᴄʟᴏsᴇᴅ ✨"
+            "ᴄʟᴏsᴇᴅ ✨"
         )
 
         await query.message.delete()
@@ -244,7 +196,7 @@ async def vc_close_callback(client, query: CallbackQuery):
 
         try:
             await query.answer(
-                "ᴜɴᴀʙʟᴇ ᴛᴏ ᴄʟᴏsᴇ ᴛʜɪs ᴍᴇssᴀɢᴇ.",
+                "ᴄᴀɴɴᴏᴛ ᴄʟᴏsᴇ ᴛʜɪs ᴍᴇssᴀɢᴇ.",
                 show_alert=True,
             )
         except Exception:
