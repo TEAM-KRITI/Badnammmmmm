@@ -13,11 +13,11 @@ from typing import Union
 import yt_dlp
 from pyrogram.enums import MessageEntityType
 from pyrogram.types import Message
-from py_yt import VideosSearch, Playlist
+from py_yt import VideosSearch
 import aiohttp
 
 API_URL = os.environ.get("MEOW_API_URL", "https://music.yukiapi.site")
-API_KEY = os.environ.get("MEOW_API_KEY", "YOUR_API_KEY") # 🔑 Get Key: @MeowApiRobot On Telegram 
+API_KEY = os.environ.get("MEOW_API_KEY", "yuki_a389f65d18dc24ae58aa7c9c358bc200") # 🔑 Get Key: @MeowApiRobot On Telegram 
 
 DOWNLOAD_DIR = "downloads"
 
