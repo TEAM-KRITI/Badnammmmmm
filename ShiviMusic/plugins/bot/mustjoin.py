@@ -13,7 +13,7 @@ from ShiviMusic import app
 
 #--------------------------
 
-MUST_JOIN = "annu_updates"
+MUST_JOIN = "kirti_bots"
 #------------------------
 @app.on_message(filters.incoming & filters.private, group=-1)
 async def must_join_channel(app: Client, msg: Message):
@@ -35,8 +35,8 @@ async def must_join_channel(app: Client, msg: Message):
                     reply_markup=InlineKeyboardMarkup(
                         [
                             [
-                                InlineKeyboardButton("• ᴊᴏɪɴ •", url="https://t.me/annu_updates"),
-                                InlineKeyboardButton("• ᴊᴏɪɴ •", url="https://t.me/annu_support"),
+                                InlineKeyboardButton("• ᴊᴏɪɴ •", url="https://t.me/kirti_bots"),
+                                InlineKeyboardButton("• ᴊᴏɪɴ •", url="https://t.me/kirti_bots_support"),
                             ]
                         ]
                     )
