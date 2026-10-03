@@ -17,8 +17,8 @@ from ShiviMusic.utils.database import (
     remove_active_chat,
     remove_active_video_chat,
 )
-from AarumiMusic.utils.decorators.language import language
-from AarumiMusic.utils.pastebin import AarumiBin
+from ShiviMusic.utils.decorators.language import language
+from ShiviMusic.utils.pastebin import AarumiBin
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
